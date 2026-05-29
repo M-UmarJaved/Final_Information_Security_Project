@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniShield Academy | Student Portal</title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="app.js" defer></script>
+    <style>
+        .mono {
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">U</div>
+            <div class="brand-text">
+                <div>UniShield Academy</div>
+                <span>Student portal and payload integrity demo</span>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="landing.html">Landing</a>
+            <a class="active" href="student_portal.html">Student Portal</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="admin.html">Admin</a>
+            <a href="login.html">Login</a>
+            <button type="button" onclick="logout()">Logout</button>
+        </nav>
+    </header>
+
+    <section class="hero animate-in">
+        <div class="hero-grid">
+            <div>
+                <span class="eyebrow">Phase 1 / Phase 2 demo</span>
+                <h1 class="title">Fetch a student record, intercept the payload, and prove the middleware changes the outcome.</h1>
+                <p class="subtitle">
+                    This portal exposes the same school data in two modes. In unsecured mode the attacker can change
+                    JSON in transit. In secured mode the browser signs the request and the server verifies the payload
+                    before reading from the database.
+                </p>
+                <div class="stats-row">
+                    <span class="stat-chip" id="server-mode-chip">Server mode: --</span>
+                    <span class="stat-chip" id="request-mode-chip">Request mode: --</span>
+                    <span class="stat-chip" id="role-chip">Role: --</span>
+                </div>
+            </div>
+            <div class="card soft">
+                <h3 class="section-title">Control panel</h3>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Payload mode</label>
+                        <div class="layout-2">
+                            <button type="button" class="button secondary" id="btn-unsecured" onclick="setMode(false)">Unsecured</button>
+                            <button type="button" class="button primary" id="btn-secured" onclick="setMode(true)">Secured</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="studentSelect">Student</label>
+                        <select id="studentSelect">
+                            <option value="">Loading students...</option>
+                        </select>
+                    </div>
+                    <button class="button primary" id="fetchBtn" type="button" onclick="fetchGrade()">Fetch student profile</button>
+                    <div class="mini-note">Choose a student, then switch the payload mode to see the attack path in the Kali proxy.</div>
+                    <div class="notice hidden" id="notice"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-grid">
+        <div class="metric-grid">
+            <article class="card metric-card animate-in">
+                <div class="label">Grade</div>
+                <div class="value" id="metric-grade">--</div>
+                <div class="muted">Returned from `/api/student`</div>
+            </article>
+            <article class="card metric-card animate-in">
+                <div class="label">Attendance</div>
+                <div class="value" id="metric-attendance">--</div>
+                <div class="muted">Semester attendance score</div>
+            </article>
+            <article class="card metric-card animate-in">
+                <div class="label">Fee balance</div>
+                <div class="value" id="metric-fee">--</div>
+                <div class="muted">Outstanding account balance</div>
+            </article>
+            <article class="card metric-card animate-in">
+                <div class="label">Courses</div>
+                <div class="value" id="metric-courses">--</div>
+                <div class="muted">Enrolled module count</div>
+            </article>
+        </div>
+
+        <div class="layout-2">
+            <article class="card animate-in">
+                <div class="row-title">Student profile</div>
+                <div class="row-subtitle">The response is verified in secured mode before the UI renders it.</div>
+                <div id="profile-panel" class="content-grid" style="margin-top: 16px;">
+                    <div class="mini-note">No student profile loaded yet.</div>
+                </div>
+            </article>
+
+            <article class="card animate-in">
+                <div class="row-title">Live attack trace</div>
+                <div class="row-subtitle">Browser action, proxy change, and server outcome.</div>
+                <div id="log" class="mini-note mono" style="margin-top: 16px; min-height: 420px; max-height: 420px; overflow: auto;">Portal ready.</div>
+            </article>
+        </div>
+
+        <div class="layout-2">
+            <article class="card animate-in">
+                <div class="row-title">Enrolled courses</div>
+                <div class="row-subtitle">Real academic modules populated from the database.</div>
+                <div id="course-list" class="list-grid" style="margin-top: 16px;">
+                    <div class="mini-note">No course data loaded yet.</div>
+                </div>
+            </article>
+
+            <article class="card animate-in">
+                <div class="row-title">Security surface</div>
+                <div class="row-subtitle">Route discovery visible to the proxy and protected by signatures in secured mode.</div>
+                <div id="route-list" class="list-grid" style="margin-top: 16px;">
+                    <div class="mini-note">Loading route catalog...</div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+
+<script>
+    let currentHealth = null;
+    let requestMode = 'unsecured';
+
+    function setMode(secured) {
+        requestMode = secured ? 'secured' : 'unsecured';
+        document.getElementById('btn-unsecured').className = secured ? 'button secondary' : 'button primary';
+        document.getElementById('btn-secured').className = secured ? 'button primary' : 'button secondary';
+        document.getElementById('request-mode-chip').textContent = `Request mode: ${secured ? 'signed' : 'raw'}`;
+        logMessage(`[MODE] Switched to ${secured ? 'SECURED' : 'UNSECURED'} request flow.`);
+    }
+
+    function logMessage(message) {
+        const log = document.getElementById('log');
+        const time = new Date().toLocaleTimeString();
+        log.textContent += `\n${time} > ${message}`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function setStatusChip(message, targetId) {
+        document.getElementById(targetId).textContent = message;
+    }
+
+    async function logout() {
+        await UniShield.resolveApiBase();
+        if (currentHealth && currentHealth.mode === 'SECURED') {
+            try {
+                await UniShield.apiRequest('/api/auth/logout', { method: 'POST' });
+            } catch (error) {
+                // Ignore logout failures and redirect.
+            }
+            window.location.href = 'login.html';
+            return;
+        }
+        window.location.href = 'landing.html';
+    }
+
+    async function loadSessionBadge() {
+        if (!currentHealth || currentHealth.mode === 'UNSECURED') {
+            setStatusChip('Role: guest (unsecured mode)', 'role-chip');
+            return;
+        }
+
+        const result = await UniShield.apiRequest('/api/auth/me');
+        if (result.ok) {
+            setStatusChip(`Role: ${result.data.role || 'user'}`, 'role-chip');
+            return;
+        }
+
+        setStatusChip('Role: guest (API key mode)', 'role-chip');
+    }
+
+    async function loadStudents() {
+        const result = await UniShield.apiRequest('/api/students');
+        const select = document.getElementById('studentSelect');
+        if (!result.ok) {
+            select.innerHTML = '<option value="">Failed to load students</option>';
+            logMessage(`[ERROR] ${result.data.error || 'Could not load student list.'}`);
+            return;
+        }
+
+        const students = result.data.students || [];
+        select.innerHTML = '';
+        students.forEach((student, index) => {
+            const option = document.createElement('option');
+            option.value = student.id;
+            option.textContent = `${student.id} — ${student.name} · ${student.semester || 'Unknown semester'}${index === 0 ? ' (Primary)' : ''}`;
+            select.appendChild(option);
+        });
+
+        if (students[0]) {
+            select.value = students[0].id;
+        }
+        logMessage(`[INIT] Loaded ${students.length} student profiles from the database.`);
+    }
+
+    async function loadRouteCatalog() {
+        const result = await UniShield.apiRequest('/api/routes');
+        const container = document.getElementById('route-list');
+        container.innerHTML = '';
+
+        if (!result.ok) {
+            container.innerHTML = '<div class="mini-note">Route discovery unavailable.</div>';
+            return;
+        }
+
+        const routes = result.data.routes || [];
+        routes.slice(0, 7).forEach(route => {
+            const row = document.createElement('div');
+            row.className = 'route-row compact';
+            row.innerHTML = `
+                <div>
+                    <div class="row-title">${UniShield.escapeHtml(route.path)}</div>
+                    <div class="row-subtitle">${UniShield.escapeHtml(route.purpose)}</div>
+                </div>
+                <span class="badge">${route.method}</span>
+                <span class="badge">${route.visibility}</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function renderCourses(courses) {
+        const container = document.getElementById('course-list');
+        container.innerHTML = '';
+        if (!courses || courses.length === 0) {
+            container.innerHTML = '<div class="mini-note">No course records found.</div>';
+            return;
+        }
+
+        courses.forEach(course => {
+            const row = document.createElement('div');
+            row.className = 'table-row compact';
+            row.innerHTML = `
+                <div>
+                    <div class="row-title">${UniShield.escapeHtml(course.course_code)} · ${UniShield.escapeHtml(course.title || 'Course')}</div>
+                    <div class="row-subtitle">${UniShield.escapeHtml(course.department || 'Department')} · ${UniShield.escapeHtml(course.instructor || 'TBA')} · ${UniShield.escapeHtml(course.schedule || 'Schedule TBD')}</div>
+                </div>
+                <span class="badge">${UniShield.escapeHtml(course.study_mode || 'Core')}</span>
+                <span class="badge success">${UniShield.formatNumber(course.credits || 0)} cr</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    function renderProfile(data, requestedStudentId) {
+        const profilePanel = document.getElementById('profile-panel');
+        const attendance = data.attendance || {};
+        const feeAccount = data.fee_account || {};
+        const courses = data.enrolled_courses || [];
+        const attendancePercent = Number(attendance.percentage || 0);
+        const feeBalance = Number(feeAccount.due_amount || 0);
+
+        document.getElementById('metric-grade').textContent = data.grade || '--';
+        document.getElementById('metric-attendance').textContent = UniShield.formatPercent(attendancePercent);
+        document.getElementById('metric-fee').textContent = UniShield.formatCurrency(feeBalance);
+        document.getElementById('metric-courses').textContent = `${courses.length}`;
+
+        profilePanel.innerHTML = `
+            <div class="layout-2">
+                <div class="timeline-item">
+                    <strong>${UniShield.escapeHtml(data.name || 'Unknown student')}</strong>
+                    <span class="muted">${UniShield.escapeHtml(data.student_id || requestedStudentId)} · ${UniShield.escapeHtml(data.course || 'Program')}</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Security status</strong>
+                    <span class="muted">${UniShield.escapeHtml(data.security || 'No security marker returned')}</span>
+                </div>
+            </div>
+            <div class="layout-2">
+                <div class="timeline-item">
+                    <strong>Academic summary</strong>
+                    <span class="muted">Semester: ${UniShield.escapeHtml(data.semester || '--')}</span>
+                    <span class="muted">Advisor: ${UniShield.escapeHtml(data.advisor || '--')}</span>
+                    <span class="muted">Track: ${UniShield.escapeHtml(data.track || '--')}</span>
+                    <span class="muted">Campus: ${UniShield.escapeHtml(data.campus || '--')}</span>
+                    <span class="muted">Status: ${UniShield.escapeHtml(data.status || '--')}</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Marks &amp; GPA</strong>
+                    <span class="muted">Grade: ${UniShield.escapeHtml(data.grade || '--')}</span>
+                    <span class="muted">Marks: ${UniShield.formatNumber(data.marks || 0)}/100</span>
+                    <span class="muted">GPA: ${Number(data.gpa || 0).toFixed(2)}/4.0</span>
+                    <div class="progress"><span style="width: ${Math.min(Math.max(Number(data.gpa || 0) / 4 * 100, 0), 100)}%;"></span></div>
+                </div>
+            </div>
+            <div class="layout-2">
+                <div class="timeline-item">
+                    <strong>Attendance</strong>
+                    <span class="muted">Present classes: ${UniShield.formatNumber(attendance.present_classes || 0)} / ${UniShield.formatNumber(attendance.total_classes || 0)}</span>
+                    <span class="muted">Attendance rate: ${UniShield.formatPercent(attendancePercent)}</span>
+                    <span class="muted">Trend: ${UniShield.escapeHtml(attendance.trend || '--')}</span>
+                    <div class="progress"><span style="width: ${Math.min(Math.max(attendancePercent, 0), 100)}%;"></span></div>
+                </div>
+                <div class="timeline-item">
+                    <strong>Fee account</strong>
+                    <span class="muted">Semester: ${UniShield.escapeHtml(feeAccount.semester || '--')}</span>
+                    <span class="muted">Paid: ${UniShield.formatCurrency(feeAccount.paid_amount || 0)}</span>
+                    <span class="muted">Due: ${UniShield.formatCurrency(feeBalance)}</span>
+                    <span class="muted">Status: ${UniShield.escapeHtml(feeAccount.status || '--')}</span>
+                    <div class="progress"><span style="width: ${feeAccount.total_fee ? Math.min(Math.max((Number(feeAccount.paid_amount || 0) / Number(feeAccount.total_fee || 1)) * 100, 0), 100) : 0}%;"></span></div>
+                </div>
+            </div>
+        `;
+
+        renderCourses(courses);
+
+        if (requestedStudentId && data.student_id && data.student_id !== requestedStudentId) {
+            logMessage(`[ALERT] Requested ${requestedStudentId} but received ${data.student_id}.`);
+            profilePanel.insertAdjacentHTML('afterbegin', '<div class="warning">ATTACK SUCCESSFUL: the proxy changed the student_id before the server read it.</div>');
+        }
+    }
+
+    async function fetchGrade() {
+        const select = document.getElementById('studentSelect');
+        const studentId = select.value;
+        const fetchBtn = document.getElementById('fetchBtn');
+        const notice = document.getElementById('notice');
+        notice.classList.add('hidden');
+
+        if (!studentId) {
+            notice.textContent = 'Please select a student first.';
+            notice.classList.remove('hidden');
+            return;
+        }
+
+        logMessage(`[REQUEST] student_id=${studentId}`);
+        logMessage(`[REQUEST] payload mode=${requestMode}`);
+
+        let payload = { student_id: studentId };
+        if (requestMode === 'secured') {
+            payload = await UniShield.signPayload(payload);
+            logMessage('[SECURITY] Payload signed with HMAC-SHA256.');
+        } else {
+            logMessage('[SECURITY] Plain JSON body sent without signature.');
+        }
+
+        const headers = UniShield.buildHeaders(true);
+
+        try {
+            fetchBtn.disabled = true;
+            fetchBtn.textContent = 'Fetching...';
+
+            const response = await fetch(`${UniShield.getApiBase()}/api/student`, {
+                method: 'POST',
+                headers,
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+
+            const text = await response.text();
+            let data = {};
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (error) {
+                data = { error: 'Invalid server response', raw: text };
+            }
+
+            if (currentHealth && currentHealth.mode === 'SECURED' && data && typeof data === 'object') {
+                if (!('signature' in data) || !('timestamp' in data)) {
+                    throw new Error('Missing signature or timestamp');
+                }
+                const verification = await UniShield.verifySignedPayload(data);
+                if (!verification.ok) {
+                    throw new Error(verification.reason);
+                }
+                data = verification.payload;
+            }
+
+            logMessage(`[RESPONSE] HTTP ${response.status}`);
+            if (response.status === 403) {
+                notice.textContent = data.reason || data.error || 'Request blocked by security middleware.';
+                notice.classList.remove('hidden');
+                document.getElementById('profile-panel').innerHTML = `
+                    <div class="warning">${UniShield.escapeHtml(data.error || 'Attack blocked by security middleware')}</div>
+                    <div class="mini-note" style="margin-top: 12px;">Reason: ${UniShield.escapeHtml(data.reason || 'Unknown')}</div>
+                `;
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+
+            renderProfile(data, studentId);
+            logMessage(`[SUCCESS] Loaded record for ${data.name || studentId}.`);
+        } catch (error) {
+            notice.textContent = error.message || 'Could not fetch student profile.';
+            notice.classList.remove('hidden');
+            logMessage(`[ERROR] ${error.message}`);
+        } finally {
+            fetchBtn.disabled = false;
+            fetchBtn.textContent = 'Fetch student profile';
+        }
+    }
+
+    async function loadPortal() {
+        currentHealth = await UniShield.resolveApiBase();
+        const health = currentHealth;
+        if (!health) {
+            document.getElementById('server-mode-chip').textContent = 'Server mode: offline';
+            document.getElementById('request-mode-chip').textContent = 'Request mode: --';
+            document.getElementById('role-chip').textContent = 'Role: --';
+            document.getElementById('profile-panel').innerHTML = '<div class="warning">API not reachable. Start the Flask server.</div>';
+            return;
+        }
+
+        setStatusChip(`Server mode: ${health.mode}`, 'server-mode-chip');
+        setMode(health.mode === 'SECURED');
+
+        await loadSessionBadge();
+        await loadStudents();
+        await loadRouteCatalog();
+        document.getElementById('fetchBtn').disabled = false;
+    }
+
+    window.addEventListener('DOMContentLoaded', loadPortal);
+</script>
+</body>
+</html>

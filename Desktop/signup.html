@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniShield Academy | Signup</title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="app.js" defer></script>
+</head>
+<body>
+<div class="auth-shell">
+    <section class="auth-hero animate-in">
+        <span class="eyebrow">Create a management account</span>
+        <h1 class="title">Register a secure user for the school console.</h1>
+        <p class="subtitle">
+            In secured mode, signup requests are signed before they leave the browser.
+            That means the same integrity control used for student records also protects account creation and admin operations.
+        </p>
+        <div class="stats-row">
+            <span class="stat-chip">Signed signup payloads</span>
+            <span class="stat-chip">Role-based access</span>
+            <span class="stat-chip">Replay protection</span>
+        </div>
+        <div class="content-grid" style="margin-top: 26px;">
+            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+                <strong>Admin accounts</strong>
+                <span class="muted" style="color: rgba(255,255,255,0.78);">Use the configured admin email to auto-assign the admin role during evaluation.</span>
+            </div>
+            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+                <strong>Security story</strong>
+                <span class="muted" style="color: rgba(255,255,255,0.78);">A tampered signup body fails signature verification before it reaches business logic.</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-card card animate-in">
+        <span class="eyebrow">New user</span>
+        <h2 class="section-title" style="font-size: 26px; margin-top: 14px;">Create your account</h2>
+        <p class="muted">This form is used for the secured management demo and role-based evaluation.</p>
+
+        <div class="form-grid" style="margin-top: 22px;">
+            <div class="field">
+                <label for="full_name">Full name</label>
+                <input class="input" id="full_name" type="text" placeholder="Your name" />
+            </div>
+            <div class="field">
+                <label for="email">Email</label>
+                <input class="input" id="email" type="email" placeholder="you@university.edu" />
+            </div>
+            <div class="field">
+                <label for="password">Password</label>
+                <input class="input" id="password" type="password" placeholder="At least 8 characters" />
+            </div>
+            <button class="button primary" id="signupBtn" type="button" onclick="signup()">Create Account</button>
+            <div class="notice hidden" id="notice"></div>
+            <div class="error hidden" id="error"></div>
+            <div class="helper">Already have an account? <a href="login.html">Sign in</a></div>
+            <a class="button ghost" href="landing.html">Back to landing</a>
+        </div>
+    </section>
+</div>
+
+<script>
+    async function signup() {
+        const notice = document.getElementById('notice');
+        const error = document.getElementById('error');
+        notice.classList.add('hidden');
+        error.classList.add('hidden');
+        error.textContent = '';
+
+        const full_name = document.getElementById('full_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const button = document.getElementById('signupBtn');
+
+        const health = await UniShield.resolveApiBase();
+        if (!health) {
+            notice.textContent = 'API not reachable. Start the secured Flask server first.';
+            notice.classList.remove('hidden');
+            return;
+        }
+        if (health.mode === 'UNSECURED') {
+            notice.textContent = 'Signup is only available in secured mode. Start app_secured.py to continue.';
+            notice.classList.remove('hidden');
+            button.disabled = true;
+            return;
+        }
+
+        if (!full_name || !email || !password) {
+            error.textContent = 'Please fill in all fields.';
+            error.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            button.disabled = true;
+            button.textContent = 'Creating...';
+            const result = await UniShield.apiRequest('/api/auth/signup', {
+                method: 'POST',
+                body: { full_name, email, password }
+            });
+
+            if (!result.ok) {
+                throw new Error(result.data.error || `HTTP ${result.status}`);
+            }
+
+            localStorage.setItem('ACTIVE_USER_ROLE', result.data.role || '');
+            window.location.href = 'dashboard.html';
+        } catch (err) {
+            error.textContent = err.message || 'Signup failed.';
+            error.classList.remove('hidden');
+        } finally {
+            button.disabled = false;
+            button.textContent = 'Create Account';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const health = await UniShield.resolveApiBase();
+        const notice = document.getElementById('notice');
+        if (!health) {
+            notice.textContent = 'API not reachable yet. Please start the secured server.';
+            notice.classList.remove('hidden');
+            return;
+        }
+        if (health.mode === 'UNSECURED') {
+            notice.textContent = 'This page is disabled in unsecured mode because signup is part of the secured management workflow.';
+            notice.classList.remove('hidden');
+            document.getElementById('signupBtn').disabled = true;
+        }
+    });
+</script>
+</body>
+</html>
