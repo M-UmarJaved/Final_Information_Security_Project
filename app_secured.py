@@ -1,4 +1,5 @@
 import re
+import secrets
 import time
 
 from flask import Flask, jsonify, request, session
@@ -38,11 +39,13 @@ from database import (
     get_route_catalog,
     get_student_profile,
     get_students,
+    get_user_by_auth_token,
     get_user_by_email,
     get_user_by_id,
     get_users,
     init_db,
     log_api_event,
+    create_auth_token,
     update_policy_status,
     update_user_role
 )
@@ -53,7 +56,11 @@ app.secret_key = APP_SECRET_KEY
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = SESSION_COOKIE_SECURE
-CORS(app, supports_credentials=True)
+CORS(
+    app,
+    supports_credentials=True,
+    allow_headers=['Content-Type', 'X-API-Key', 'X-Auth-Token', 'Authorization']
+)
 
 _rate_limits = {}
 
@@ -126,6 +133,19 @@ def is_valid_student_id(student_id):
 
 
 def require_login():
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token = auth_header.removeprefix('Bearer ').strip()
+        user = get_user_by_auth_token(token)
+        if user:
+            return user
+
+    token = request.headers.get('X-Auth-Token', '').strip()
+    if token:
+        user = get_user_by_auth_token(token)
+        if user:
+            return user
+
     user_id = session.get('user_id')
     if not user_id:
         return None
@@ -177,6 +197,26 @@ def require_admin():
     if not user or not require_role(user, {'admin'}):
         return None
     return user
+
+
+def issue_auth_token(user_id):
+    token = secrets.token_urlsafe(32)
+    create_auth_token(token, user_id)
+    return token
+
+
+def revoke_auth_token(token):
+    if token:
+        from database import revoke_auth_token as revoke_token_record
+        revoke_token_record(token)
+
+
+def extract_auth_token():
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        return auth_header.removeprefix('Bearer ').strip()
+    token = request.headers.get('X-Auth-Token', '').strip()
+    return token or None
 
 
 @app.route('/api/health', methods=['GET'])
@@ -247,7 +287,8 @@ def signup():
     password_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
     user_id = create_user(email, full_name, password_hash, role)
     session['user_id'] = user_id
-    return secure_response({'id': user_id, 'email': email, 'full_name': full_name, 'role': role}, 201)
+    auth_token = issue_auth_token(user_id)
+    return secure_response({'id': user_id, 'email': email, 'full_name': full_name, 'role': role, 'auth_token': auth_token}, 201)
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -275,16 +316,21 @@ def login():
         return secure_response({'error': 'Invalid email or password'}, 401)
 
     session['user_id'] = user['id']
+    auth_token = issue_auth_token(user['id'])
     return secure_response({
         'id': user['id'],
         'email': user['email'],
         'full_name': user['full_name'],
-        'role': user['role']
+        'role': user['role'],
+        'auth_token': auth_token
     })
 
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
+    token = extract_auth_token()
+    if token:
+        revoke_auth_token(token)
     session.clear()
     return secure_response({'status': 'signed_out'})
 

@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Login</title>
-    <link rel="stylesheet" href="app.css" />
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="app.css?v=20260529" />
+    <script src="app.js?v=20260529" defer></script>
 </head>
 <body>
 <div class="auth-shell">
@@ -68,7 +68,7 @@
         const password = document.getElementById('password').value;
         const button = document.getElementById('loginBtn');
 
-        const health = await UniShield.resolveApiBase();
+        const health = await UniShield.resolveApiBase(true, 'secured');
         if (!health) {
             notice.textContent = 'API not reachable. Start the secured Flask server first.';
             notice.classList.remove('hidden');
@@ -99,6 +99,7 @@
                 throw new Error(result.data.error || `HTTP ${result.status}`);
             }
 
+            UniShield.setAuthToken(result.data.auth_token || '');
             localStorage.setItem('ACTIVE_USER_ROLE', result.data.role || '');
             window.location.href = 'dashboard.html';
         } catch (err) {
@@ -111,7 +112,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-        const health = await UniShield.resolveApiBase();
+        const health = await UniShield.resolveApiBase(true, 'secured');
         const notice = document.getElementById('notice');
         if (!health) {
             notice.textContent = 'API not reachable yet. Please start the secured server.';

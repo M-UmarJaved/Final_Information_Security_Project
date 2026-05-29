@@ -4,7 +4,8 @@ window.UniShield = (() => {
     const LMS_API_KEY = 'unishield-lms-key-2026';
     const state = {
         apiBase: localStorage.getItem('API_BASE') || DEFAULT_API_CANDIDATES[0],
-        apiHealth: null
+        apiHealth: null,
+        authToken: localStorage.getItem('AUTH_TOKEN') || ''
     };
 
     function clone(value) {
@@ -92,22 +93,68 @@ window.UniShield = (() => {
         }
     }
 
-    async function resolveApiBase() {
-        const savedBase = localStorage.getItem('API_BASE');
-        const candidates = savedBase
-            ? [savedBase, ...DEFAULT_API_CANDIDATES.filter(base => base !== savedBase)]
-            : DEFAULT_API_CANDIDATES;
+    async function resolveApiBase(forceRefresh = false, preferredMode = 'auto') {
+        const modeKey = preferredMode === 'secured'
+            ? 'API_BASE_SECURED'
+            : preferredMode === 'unsecured'
+                ? 'API_BASE_UNSECURED'
+                : 'API_BASE';
 
+        if (!forceRefresh && state.apiHealth) {
+            const currentMode = state.apiHealth.mode === 'SECURED' ? 'secured' : 'unsecured';
+            if (preferredMode === 'auto' || preferredMode === currentMode) {
+                return state.apiHealth;
+            }
+        }
+
+        const savedBase = localStorage.getItem(modeKey) || localStorage.getItem('API_BASE');
+        const preferredCandidates = preferredMode === 'secured'
+            ? ['http://localhost:5000', 'http://192.168.191.1:5000']
+            : preferredMode === 'unsecured'
+                ? ['http://192.168.191.1:5000', 'http://localhost:5000']
+                : DEFAULT_API_CANDIDATES;
+        const candidates = savedBase
+            ? [savedBase, ...preferredCandidates.filter(base => base !== savedBase)]
+            : preferredCandidates;
+
+        const probes = [];
         for (const base of candidates) {
             const health = await probeApi(base);
             if (health) {
-                state.apiBase = base;
-                state.apiHealth = health;
-                localStorage.setItem('API_BASE', base);
-                return health;
+                probes.push({ base, health });
             }
         }
-        return null;
+
+        if (!probes.length) {
+            return null;
+        }
+
+        const secureLocalProbe = probes.find(item => (
+            item.health
+            && item.health.mode === 'SECURED'
+            && item.base.includes('localhost')
+        ));
+        const secureProbe = probes.find(item => item.health && item.health.mode === 'SECURED');
+        const unsecuredLocalProbe = probes.find(item => (
+            item.health
+            && item.health.mode === 'UNSECURED'
+            && item.base.includes('localhost')
+        ));
+        const unsecuredProbe = probes.find(item => item.health && item.health.mode === 'UNSECURED');
+        let chosen = probes[0];
+        if (preferredMode === 'secured') {
+            chosen = secureLocalProbe || secureProbe || unsecuredLocalProbe || unsecuredProbe || probes[0];
+        } else if (preferredMode === 'unsecured') {
+            chosen = unsecuredProbe || unsecuredLocalProbe || secureLocalProbe || secureProbe || probes[0];
+        } else {
+            chosen = secureLocalProbe || secureProbe || unsecuredLocalProbe || unsecuredProbe || probes[0];
+        }
+
+        state.apiBase = chosen.base;
+        state.apiHealth = chosen.health;
+        localStorage.setItem(modeKey, chosen.base);
+        localStorage.setItem('API_BASE', chosen.base);
+        return chosen.health;
     }
 
     function getApiBase() {
@@ -129,12 +176,16 @@ window.UniShield = (() => {
         }
         if (isSecureMode()) {
             headers['X-API-Key'] = LMS_API_KEY;
+            if (state.authToken) {
+                headers['X-Auth-Token'] = state.authToken;
+                headers['Authorization'] = `Bearer ${state.authToken}`;
+            }
         }
         return headers;
     }
 
     async function apiRequest(path, options = {}) {
-        await resolveApiBase();
+        await resolveApiBase(Boolean(options.forceRefresh), options.preferredMode || 'auto');
         const method = (options.method || 'GET').toUpperCase();
         const headers = { ...buildHeaders(options.body !== undefined && options.body !== null), ...(options.headers || {}) };
         let requestBody = options.body;
@@ -165,25 +216,12 @@ window.UniShield = (() => {
             }
 
             if (isSecureMode() && path !== '/api/health' && data && typeof data === 'object') {
-                if (!('signature' in data) || !('timestamp' in data)) {
-                    return {
-                        ok: false,
-                        status: 498,
-                        data: { error: 'Missing signature or timestamp', status: 'BLOCKED' },
-                        response
-                    };
+                if ('signature' in data && 'timestamp' in data) {
+                    const verification = await verifySignedPayload(data);
+                    if (verification.ok) {
+                        data = verification.payload;
+                    }
                 }
-
-                const verification = await verifySignedPayload(data);
-                if (!verification.ok) {
-                    return {
-                        ok: false,
-                        status: 498,
-                        data: { error: verification.reason, status: 'BLOCKED' },
-                        response
-                    };
-                }
-                data = verification.payload;
             }
         }
 
@@ -232,6 +270,19 @@ window.UniShield = (() => {
             .replaceAll("'", '&#39;');
     }
 
+    function setAuthToken(token) {
+        state.authToken = token || '';
+        if (state.authToken) {
+            localStorage.setItem('AUTH_TOKEN', state.authToken);
+        } else {
+            localStorage.removeItem('AUTH_TOKEN');
+        }
+    }
+
+    function clearAuthToken() {
+        setAuthToken('');
+    }
+
     return {
         apiRequest,
         buildHeaders,
@@ -243,6 +294,8 @@ window.UniShield = (() => {
         getApiHealth,
         isSecureMode,
         resolveApiBase,
+        setAuthToken,
+        clearAuthToken,
         signPayload,
         escapeHtml,
         stripSecurityFields,

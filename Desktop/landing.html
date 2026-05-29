@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Security Middleware Lab</title>
-    <link rel="stylesheet" href="app.css" />
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="app.css?v=20260529" />
+    <script src="app.js?v=20260529" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -137,7 +137,7 @@
         const timeline = document.getElementById('timeline');
         const moduleGrid = document.getElementById('module-grid');
 
-        const health = await UniShield.resolveApiBase();
+        const health = await UniShield.resolveApiBase(true, 'unsecured');
         if (!health) {
             status.innerHTML = 'API not reachable. Start <strong>app_unsecured.py</strong> or <strong>app_secured.py</strong>.';
             timeline.innerHTML = `

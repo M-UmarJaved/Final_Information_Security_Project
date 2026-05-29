@@ -144,6 +144,12 @@ def init_db():
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )''')
 
+    c.execute('''CREATE TABLE IF NOT EXISTS auth_tokens (
+        token TEXT PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )''')
+
     # Lightweight migration for existing databases
     c.execute("PRAGMA table_info(users)")
     user_columns = {row[1] for row in c.fetchall()}
@@ -648,6 +654,40 @@ def update_user_role(user_id, role):
     row = c.fetchone()
     conn.close()
     return dict(row) if row else None
+
+def create_auth_token(token, user_id):
+    """Persist an authentication token for a user."""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute(
+        'INSERT OR REPLACE INTO auth_tokens (token, user_id) VALUES (?, ?)',
+        (token, user_id)
+    )
+    conn.commit()
+    conn.close()
+
+def get_user_by_auth_token(token):
+    """Resolve a token to a user record. Returns dict or None."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute('''
+        SELECT u.*
+        FROM auth_tokens t
+        JOIN users u ON u.id = t.user_id
+        WHERE t.token = ?
+    ''', (token,))
+    row = c.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+def revoke_auth_token(token):
+    """Remove a persisted authentication token."""
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('DELETE FROM auth_tokens WHERE token = ?', (token,))
+    conn.commit()
+    conn.close()
 
 def log_api_event(endpoint, method, status, student_id=None, client_ip=None):
     """Persist a basic API audit log entry."""

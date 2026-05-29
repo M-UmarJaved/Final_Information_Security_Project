@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Admin Console</title>
-    <link rel="stylesheet" href="app.css" />
-    <script src="app.js" defer></script>
+    <link rel="stylesheet" href="app.css?v=20260529" />
+    <script src="app.js?v=20260529" defer></script>
     <style>
         .select-wrap select {
             min-width: 140px;
@@ -139,9 +139,13 @@
             } catch (error) {
                 // Ignore logout errors.
             }
+            UniShield.clearAuthToken();
+            localStorage.removeItem('ACTIVE_USER_ROLE');
             window.location.href = 'login.html';
             return;
         }
+        UniShield.clearAuthToken();
+        localStorage.removeItem('ACTIVE_USER_ROLE');
         window.location.href = 'landing.html';
     }
 
@@ -277,7 +281,7 @@
     }
 
     async function loadAdminConsole() {
-        currentHealth = await UniShield.resolveApiBase();
+        currentHealth = await UniShield.resolveApiBase(true, 'secured');
         if (!currentHealth) {
             document.getElementById('admin-story').innerHTML = '<div class="warning">API not reachable. Start the Flask backend.</div>';
             return;

@@ -2,8 +2,8 @@
 # Central configuration file for the API Security Lab
 
 # Network configuration
-WINDOWS_IP = '192.168.191.1'       # Your Windows host IP (VMware VMnet8)
-KALI_IP    = '192.168.191.129'     # Your Kali Linux VM IP
+WINDOWS_IP = '192.168.191.1'      # Your Windows host IP (VirtualBox Host-Only)
+KALI_IP    = '192.168.191.129'    # Your Kali Linux VM IP
 
 API_PORT = 5000
 
