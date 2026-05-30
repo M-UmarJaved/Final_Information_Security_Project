@@ -93,29 +93,15 @@ window.UniShield = (() => {
         }
     }
 
-    async function resolveApiBase(forceRefresh = false, preferredMode = 'auto') {
-        const modeKey = preferredMode === 'secured'
-            ? 'API_BASE_SECURED'
-            : preferredMode === 'unsecured'
-                ? 'API_BASE_UNSECURED'
-                : 'API_BASE';
-
+    async function resolveApiBase(forceRefresh = false) {
         if (!forceRefresh && state.apiHealth) {
-            const currentMode = state.apiHealth.mode === 'SECURED' ? 'secured' : 'unsecured';
-            if (preferredMode === 'auto' || preferredMode === currentMode) {
-                return state.apiHealth;
-            }
+            return state.apiHealth;
         }
 
-        const savedBase = localStorage.getItem(modeKey) || localStorage.getItem('API_BASE');
-        const preferredCandidates = preferredMode === 'secured'
-            ? ['http://localhost:5000', 'http://192.168.191.1:5000']
-            : preferredMode === 'unsecured'
-                ? ['http://192.168.191.1:5000', 'http://localhost:5000']
-                : DEFAULT_API_CANDIDATES;
+        const savedBase = localStorage.getItem('API_BASE');
         const candidates = savedBase
-            ? [savedBase, ...preferredCandidates.filter(base => base !== savedBase)]
-            : preferredCandidates;
+            ? [savedBase, ...DEFAULT_API_CANDIDATES.filter(base => base !== savedBase)]
+            : DEFAULT_API_CANDIDATES;
 
         const probes = [];
         for (const base of candidates) {
@@ -141,18 +127,10 @@ window.UniShield = (() => {
             && item.base.includes('localhost')
         ));
         const unsecuredProbe = probes.find(item => item.health && item.health.mode === 'UNSECURED');
-        let chosen = probes[0];
-        if (preferredMode === 'secured') {
-            chosen = secureLocalProbe || secureProbe || unsecuredLocalProbe || unsecuredProbe || probes[0];
-        } else if (preferredMode === 'unsecured') {
-            chosen = unsecuredProbe || unsecuredLocalProbe || secureLocalProbe || secureProbe || probes[0];
-        } else {
-            chosen = secureLocalProbe || secureProbe || unsecuredLocalProbe || unsecuredProbe || probes[0];
-        }
+        const chosen = secureLocalProbe || secureProbe || unsecuredLocalProbe || unsecuredProbe || probes[0];
 
         state.apiBase = chosen.base;
         state.apiHealth = chosen.health;
-        localStorage.setItem(modeKey, chosen.base);
         localStorage.setItem('API_BASE', chosen.base);
         return chosen.health;
     }
@@ -185,7 +163,7 @@ window.UniShield = (() => {
     }
 
     async function apiRequest(path, options = {}) {
-        await resolveApiBase(Boolean(options.forceRefresh), options.preferredMode || 'auto');
+        await resolveApiBase();
         const method = (options.method || 'GET').toUpperCase();
         const headers = { ...buildHeaders(options.body !== undefined && options.body !== null), ...(options.headers || {}) };
         let requestBody = options.body;
@@ -302,3 +280,15 @@ window.UniShield = (() => {
         verifySignedPayload
     };
 })();
+
+window.logout = window.logout || (async () => {
+    try {
+        await window.UniShield.apiRequest('/api/auth/logout', { method: 'POST' });
+    } catch (error) {
+        // Public pages may not have an active session.
+    }
+    window.UniShield.clearAuthToken();
+    localStorage.setItem('PORTAL_MODE', 'unsecured');
+    localStorage.removeItem('ACTIVE_USER_ROLE');
+    window.location.href = 'login.html';
+});

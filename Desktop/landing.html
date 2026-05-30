@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Security Middleware Lab</title>
-    <link rel="stylesheet" href="app.css?v=20260529" />
+    <link rel="stylesheet" href="landing.css?v=20260529" />
     <script src="app.js?v=20260529" defer></script>
+    <script src="landing.js?v=20260529" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -24,18 +25,19 @@
             <a href="admin.html">Admin</a>
             <a href="login.html">Login</a>
             <a href="signup.html">Signup</a>
+            <button type="button" onclick="logout()">Logout</button>
         </nav>
     </header>
 
     <section class="hero animate-in">
         <div class="hero-grid">
             <div>
-                <span class="eyebrow">InfoSec Lab • Middleware Showcase</span>
-                <h1 class="title">A full school management system that proves why payload integrity matters.</h1>
+                <span class="eyebrow">InfoSec Lab • Middleware showcase</span>
+                <h1 class="title">A polished school platform that proves why payload integrity matters.</h1>
                 <p class="subtitle">
-                    UniShield Academy combines a realistic management system, live analytics, admin controls,
-                    and a controlled Kali MITM demo. In unsecured mode the attacker can change API payloads;
-                    in secured mode the same attack is signed, verified, and blocked.
+                    UniShield Academy combines a believable school management system, live analytics, admin controls,
+                    and a controlled Kali MITM demo. In unsecured mode the attacker can change API payloads; in secured
+                    mode the same attack is signed, verified, and blocked.
                 </p>
                 <div class="stats-row">
                     <span class="stat-chip">Phase 1: Unsecured attack</span>
@@ -51,8 +53,26 @@
             </div>
 
             <div class="card soft">
-                <h3 class="section-title">Live system snapshot</h3>
-                <div class="split-stack">
+                <div class="hero-accent">
+                    <span class="eyebrow dark">Live system snapshot</span>
+                    <h3 class="section-title" style="color: white; margin-bottom: 0;">Everything the teacher can verify at a glance</h3>
+                    <p class="subtitle">A clean summary of the backend state, the attack surface, and the security story.</p>
+                    <div class="mini-stats">
+                        <div class="mini-stat">
+                            <strong id="hero-routes">--</strong>
+                            <span>routes exposed</span>
+                        </div>
+                        <div class="mini-stat">
+                            <strong id="hero-modules">--</strong>
+                            <span>school modules</span>
+                        </div>
+                        <div class="mini-stat">
+                            <strong id="hero-mode">--</strong>
+                            <span>integrity mode</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="split-stack" style="margin-top: 18px;">
                     <div class="mini-note" id="system-status">Checking API health...</div>
                     <div class="timeline" id="timeline"></div>
                 </div>
@@ -60,7 +80,15 @@
         </div>
     </section>
 
-    <section class="content-grid">
+    <section class="content-grid section-shell">
+        <div class="section-header">
+            <div>
+                <span class="eyebrow">Executive summary</span>
+                <h2 class="section-title" style="font-size: 24px;">The platform feels like a real product, not a lab mockup.</h2>
+            </div>
+            <p class="section-copy">We keep the demo believable: management metrics, school modules, and a visual story that makes the security contrast obvious.</p>
+        </div>
+
         <div class="metric-grid">
             <article class="card metric-card animate-in">
                 <div class="label">Attack surface</div>
@@ -128,67 +156,57 @@
                 <div class="mini-note">Loading module cards...</div>
             </div>
         </article>
+
+        <div class="section-header">
+            <div>
+                <span class="eyebrow">Testimonials</span>
+                <h2 class="section-title" style="font-size: 24px;">What this demo communicates in one glance</h2>
+            </div>
+            <p class="section-copy">These cards make the project feel like a branded product pitch instead of just a proof-of-concept.</p>
+        </div>
+
+        <div class="testimonial-grid">
+            <article class="testimonial-card animate-in">
+                <div class="testimonial-quote">“The school app looks complete enough for management, and the attack/defense contrast is easy to explain live.”</div>
+                <div class="testimonial-meta">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="avatar">T</div>
+                        <div>
+                            <strong>Teacher perspective</strong>
+                            <div class="muted">Demo evaluation focus</div>
+                        </div>
+                    </div>
+                    <span class="badge success">Clear impact</span>
+                </div>
+            </article>
+            <article class="testimonial-card animate-in">
+                <div class="testimonial-quote">“Unsecured mode proves the risk, and secured mode shows the middleware doing real work instead of just hiding data.”</div>
+                <div class="testimonial-meta">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="avatar">D</div>
+                        <div>
+                            <strong>Defense narrative</strong>
+                            <div class="muted">Integrity protection</div>
+                        </div>
+                    </div>
+                    <span class="badge warn">Security proof</span>
+                </div>
+            </article>
+            <article class="testimonial-card animate-in">
+                <div class="testimonial-quote">“The UI now feels like a branded school platform, so the lab story can be presented confidently in front of the class.”</div>
+                <div class="testimonial-meta">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div class="avatar">P</div>
+                        <div>
+                            <strong>Presentation value</strong>
+                            <div class="muted">Professional finish</div>
+                        </div>
+                    </div>
+                    <span class="badge">Polished</span>
+                </div>
+            </article>
+        </div>
     </section>
 </div>
-
-<script>
-    async function renderLanding() {
-        const status = document.getElementById('system-status');
-        const timeline = document.getElementById('timeline');
-        const moduleGrid = document.getElementById('module-grid');
-
-        const health = await UniShield.resolveApiBase(true, 'unsecured');
-        if (!health) {
-            status.innerHTML = 'API not reachable. Start <strong>app_unsecured.py</strong> or <strong>app_secured.py</strong>.';
-            timeline.innerHTML = `
-                <div class="timeline-item"><strong>Backend offline</strong><span class="muted">The UI is ready, but the Flask API is not running yet.</span></div>
-            `;
-            document.getElementById('metric-mode').textContent = '--';
-            document.getElementById('metric-routes').textContent = '--';
-            document.getElementById('metric-modules').textContent = '--';
-            return;
-        }
-
-        const modulesResponse = await UniShield.apiRequest('/api/modules', { credentials: 'include' });
-        const routesResponse = await UniShield.apiRequest('/api/routes', { credentials: 'include' });
-        const routes = routesResponse.ok ? routesResponse.data.routes || [] : [];
-        const modules = modulesResponse.ok ? modulesResponse.data.modules || [] : [];
-
-        status.innerHTML = `API online in <strong>${health.mode}</strong> mode.`;
-        document.getElementById('metric-mode').textContent = health.mode;
-        document.getElementById('metric-routes').textContent = routesResponse.ok ? `${routes.length}` : '--';
-        document.getElementById('metric-modules').textContent = modulesResponse.ok ? `${modules.length}` : '--';
-
-        timeline.innerHTML = `
-            <div class="timeline-item">
-                <strong>School name</strong>
-                <span class="muted">${health.school || 'UniShield Academy'}</span>
-            </div>
-            <div class="timeline-item">
-                <strong>Tagline</strong>
-                <span class="muted">${health.tagline || 'Secure school management with API payload integrity'}</span>
-            </div>
-            <div class="timeline-item">
-                <strong>Route discovery</strong>
-                <span class="muted">${routesResponse.ok ? `${routes.length} routes available for the demo.` : 'Route map unavailable.'}</span>
-            </div>
-        `;
-
-        moduleGrid.innerHTML = '';
-        modules.forEach(module => {
-            const card = document.createElement('div');
-            card.className = 'card module-card';
-            card.innerHTML = `
-                <span class="eyebrow">${module.label}</span>
-                <div class="metric">${module.metric}</div>
-                <div class="muted">${module.metric_label}</div>
-                <div class="subtitle" style="font-size:13px; margin:0;">${module.description}</div>
-            `;
-            moduleGrid.appendChild(card);
-        });
-    }
-
-    window.addEventListener('DOMContentLoaded', renderLanding);
-</script>
 </body>
 </html>

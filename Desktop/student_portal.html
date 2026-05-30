@@ -1,611 +1,124 @@
 <!-- student_portal.html – Save on Windows Desktop and open in browser -->
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 <head>
-    <meta charset='UTF-8'>
-    <title>Student Grade Portal</title>
-    <style>
-        :root {
-            --bg-1: #f6f7fb;
-            --bg-2: #eef1f8;
-            --ink: #0c1222;
-            --muted: #5c647a;
-            --brand-1: #1a73ff;
-            --brand-2: #00c2ff;
-            --accent-1: #ff7a59;
-            --accent-2: #18c29c;
-            --card: #ffffff;
-            --border: #e7eaf3;
-            --shadow: 0 18px 60px rgba(12, 18, 34, 0.12);
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; font-family: "Poppins", "Trebuchet MS", sans-serif; }
-
-        body {
-            min-height:100vh;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            padding:32px;
-            color:var(--ink);
-            background:
-                radial-gradient(1200px 600px at -10% -10%, #dbe7ff 0%, transparent 55%),
-                radial-gradient(900px 500px at 110% 10%, #d7f7ff 0%, transparent 55%),
-                linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
-        }
-
-        .page {
-            width:min(1100px, 100%);
-            display:grid;
-            grid-template-columns: minmax(280px, 420px) minmax(360px, 1fr);
-            gap:28px;
-            align-items:stretch;
-        }
-
-        .hero {
-            padding:28px 28px 22px;
-            background:linear-gradient(155deg, #10162f 0%, #0b1226 55%, #0e1a3b 100%);
-            border-radius:24px;
-            color:#f5f7ff;
-            box-shadow:var(--shadow);
-            position:relative;
-            overflow:hidden;
-            animation:card-in 600ms ease-out both;
-        }
-
-        .hero::after {
-            content:"";
-            position:absolute;
-            right:-120px;
-            top:-120px;
-            width:320px;
-            height:320px;
-            background:radial-gradient(circle, rgba(26,115,255,0.5), transparent 60%);
-            opacity:0.9;
-        }
-
-        .hero h1 {
-            font-size:28px;
-            line-height:1.15;
-            letter-spacing:0.2px;
-            font-weight:800;
-            margin-bottom:10px;
-        }
-
-        .hero p {
-            font-size:14px;
-            color:#c9d4ff;
-            margin-bottom:18px;
-        }
-
-        .hero .pill {
-            display:inline-flex;
-            align-items:center;
-            gap:8px;
-            padding:8px 14px;
-            border-radius:999px;
-            background:rgba(255,255,255,0.1);
-            font-size:12px;
-            font-weight:700;
-            margin-bottom:18px;
-        }
-
-        .hero .stack {
-            display:grid;
-            gap:12px;
-        }
-
-        .hero .stack .item {
-            display:flex;
-            gap:10px;
-            align-items:flex-start;
-            background:rgba(255,255,255,0.08);
-            border:1px solid rgba(255,255,255,0.12);
-            padding:12px;
-            border-radius:14px;
-            font-size:13px;
-        }
-
-        .card {
-            background:var(--card);
-            border-radius:24px;
-            padding:30px;
-            box-shadow:var(--shadow);
-            border:1px solid var(--border);
-            animation:card-in 700ms ease-out both;
-            animation-delay:120ms;
-        }
-
-        .title {
-            font-size:20px;
-            font-weight:800;
-            letter-spacing:0.3px;
-            margin-bottom:6px;
-        }
-
-        .role-badge {
-            display:inline-flex;
-            align-items:center;
-            gap:6px;
-            padding:4px 10px;
-            border-radius:999px;
-            background:#eef3ff;
-            color:#1a4d8f;
-            font-size:11px;
-            font-weight:800;
-        }
-
-        .subtitle {
-            color:var(--muted);
-            font-size:13px;
-            margin-bottom:22px;
-        }
-
-        label { font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:8px; }
-
-        select {
-            width:100%;
-            padding:14px 16px;
-            border-radius:12px;
-            border:1px solid var(--border);
-            font-size:14px;
-            background:#fff;
-            transition:border 150ms ease, box-shadow 150ms ease;
-            margin-bottom:18px;
-        }
-
-        select:focus {
-            outline:none;
-            border-color:rgba(26,115,255,0.6);
-            box-shadow:0 0 0 4px rgba(26,115,255,0.12);
-        }
-
-        .mode-toggle {
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:10px;
-            margin-bottom:18px;
-        }
-
-        .mode-btn {
-            padding:12px 10px;
-            border-radius:12px;
-            border:1px solid var(--border);
-            cursor:pointer;
-            font-size:12px;
-            font-weight:800;
-            background:#fff;
-            transition:transform 120ms ease, box-shadow 120ms ease, border 120ms ease;
-        }
-
-        .mode-btn:hover { transform:translateY(-1px); box-shadow:0 10px 24px rgba(12,18,34,0.08); }
-
-        .mode-btn.active-unsecured { border-color:#ff9b8a; background:#fff4f1; color:#ff5c3b; }
-        .mode-btn.active-secured { border-color:#7be9c5; background:#ecfff8; color:#0da97f; }
-
-        #mode-label {
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            font-size:11px;
-            font-weight:800;
-            padding:6px 14px;
-            border-radius:999px;
-            margin-bottom:14px;
-        }
-
-        .unsecured-mode { background:#fff1ee; color:#ff5c3b; }
-        .secured-mode { background:#e9fff5; color:#0da97f; }
-
-        button#fetchBtn {
-            width:100%;
-            padding:14px 16px;
-            border-radius:14px;
-            border:none;
-            font-size:14px;
-            font-weight:800;
-            cursor:pointer;
-            color:#fff;
-            background:linear-gradient(120deg, var(--brand-1), var(--brand-2));
-            box-shadow:0 14px 28px rgba(26,115,255,0.25);
-            transition:transform 120ms ease, box-shadow 120ms ease;
-        }
-
-        button#fetchBtn:hover { transform:translateY(-1px); box-shadow:0 18px 32px rgba(26,115,255,0.28); }
-
-        .result { margin-top:20px; padding:18px; border-radius:14px; display:none; animation:fade-up 240ms ease-out; }
-        .result.success { background:#f1fff9; border:1px solid #b7f1dd; }
-        .result.error { background:#fff1f1; border:1px solid #ffc6c6; }
-        .result.blocked { background:#fff8e8; border:1px solid #ffe0a6; }
-
-        .result h3 { margin-bottom:10px; font-size:15px; }
-
-        .field {
-            display:flex;
-            justify-content:space-between;
-            gap:10px;
-            padding:8px 0;
-            border-bottom:1px solid #edf0f7;
-            font-size:13px;
-        }
-
-        .field:last-child { border-bottom:none; }
-        .field .val { font-weight:800; }
-
-        .grade-A { color:#0da97f; }
-        .grade-F { color:#ff5c3b; }
-        .grade-B { color:#1a4d8f; }
-
-        .warning {
-            background:#fff0f0;
-            border:1px solid #ffc6c6;
-            padding:10px;
-            border-radius:10px;
-            color:#ff5c3b;
-            font-size:12px;
-            margin-bottom:12px;
-            font-weight:700;
-        }
-
-        .log {
-            background:#0b1226;
-            color:#72ffb3;
-            font-family: "Fira Code", "Consolas", monospace;
-            font-size:12px;
-            padding:14px;
-            border-radius:12px;
-            margin-top:14px;
-            max-height:200px;
-            overflow-y:auto;
-            white-space:pre-wrap;
-            border:1px solid rgba(255,255,255,0.08);
-        }
-
-        .footer-note {
-            margin-top:14px;
-            font-size:11px;
-            color:var(--muted);
-            text-align:center;
-        }
-
-        .topbar {
-            width:min(1100px, 100%);
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:12px 16px;
-            margin-bottom:18px;
-            border-radius:16px;
-            background:rgba(255,255,255,0.8);
-            border:1px solid var(--border);
-            box-shadow:0 10px 30px rgba(12, 18, 34, 0.08);
-            backdrop-filter: blur(8px);
-        }
-
-        .brand {
-            display:flex;
-            align-items:center;
-            gap:10px;
-            font-weight:800;
-            letter-spacing:0.4px;
-        }
-
-        .brand-dot {
-            width:10px;
-            height:10px;
-            border-radius:50%;
-            background:linear-gradient(120deg, var(--brand-1), var(--brand-2));
-            box-shadow:0 0 12px rgba(26,115,255,0.6);
-        }
-
-        .nav {
-            display:flex;
-            gap:14px;
-            font-size:12px;
-            font-weight:700;
-        }
-
-        .nav a {
-            text-decoration:none;
-            color:var(--muted);
-            padding:6px 10px;
-            border-radius:10px;
-            transition:background 120ms ease, color 120ms ease;
-        }
-
-        .nav a.active,
-        .nav a:hover {
-            background:#eef3ff;
-            color:#1a4d8f;
-        }
-
-        .nav button {
-            border:none;
-            background:#eef3ff;
-            color:#1a4d8f;
-            font-size:12px;
-            font-weight:800;
-            padding:6px 10px;
-            border-radius:10px;
-            cursor:pointer;
-        }
-
-        @keyframes card-in {
-            from { transform:translateY(18px); opacity:0; }
-            to { transform:translateY(0); opacity:1; }
-        }
-
-        @keyframes fade-up {
-            from { transform:translateY(10px); opacity:0; }
-            to { transform:translateY(0); opacity:1; }
-        }
-
-        @media (max-width: 980px) {
-            .page { grid-template-columns:1fr; }
-            .hero { order:2; }
-            .card { order:1; }
-        }
-
-        @media (max-width: 540px) {
-            body { padding:18px; }
-            .card, .hero { padding:22px; }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Portal | Security Lab</title>
+    <link rel="stylesheet" href="student_portal.css?v=20260529">
+    <script src="student_portal.js?v=20260529" defer></script>
 </head>
 <body>
-<div class='topbar'>
-    <div class='brand'><span class='brand-dot'></span>UniShield LMS</div>
-    <nav class='nav'>
-        <a href='landing.html'>Landing</a>
-        <a href='dashboard.html'>Dashboard</a>
-        <a href='student_portal.html' class='active'>Student Portal</a>
-        <a href='login.html'>Login</a>
-        <a href='admin.html'>Admin</a>
-        <button onclick='logout()'>Logout</button>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="brand-mark">
+            U
+        </div>
+        <div class="brand-text">
+            <div>UniShield Academy</div>
+            <span>School management + API payload integrity</span>
+        </div>
+    </div>
+    <nav class="nav">
+        <a href="landing.html">Landing</a>
+        <a href="student_portal.html" class="active">Student Portal</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="admin.html">Admin</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Signup</a>
+        <button onclick="logout()">Logout</button>
     </nav>
 </div>
-<div class='page'>
-    <section class='hero'>
-        <div class='pill'>SECURITY LAB · API INTEGRITY</div>
-        <h1>Student Grade Portal</h1>
-        <p>ClickUp-inspired demo UI that highlights how a single tampered field changes outcomes without integrity checks.</p>
-        <div class='stack'>
-            <div class='item'>
-                <strong>Phase 1:</strong> Unsecured endpoint accepts any payload and exposes data.
+
+<div class="page">
+    <section class="hero">
+        <div class="pill">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Security Lab Demo
+        </div>
+        <h1>API Integrity &<br>Tamper Protection</h1>
+        <p>A professional demonstration highlighting how an unsecured endpoint can be manipulated, and how HMAC verification strictly enforces data integrity.</p>
+        
+        <div class="stack">
+            <div class="item">
+                <div class="item-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </div>
+                <div>
+                    <strong>Phase 1: Vulnerability</strong><br>
+                    <span style="color:var(--slate-400)">The unsecured endpoint blindly trusts incoming payloads, allowing attackers to request data for IDs they shouldn't access.</span>
+                </div>
             </div>
-            <div class='item'>
-                <strong>Phase 2:</strong> HMAC verified requests block MITM tampering attempts.
-            </div>
-            <div class='item'>
-                <strong>Tip:</strong> Switch modes to see the difference in real time.
+            <div class="item">
+                <div class="item-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div>
+                    <strong>Phase 2: HMAC Defense</strong><br>
+                    <span style="color:var(--slate-400)">The secured endpoint requires a cryptographic signature. Altered payloads break the signature math, resulting in an immediate block.</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class='card'>
-        <div class='title'>Request Console</div>
-        <div class='subtitle'>InfoSec Lab · Styled for clarity and impact</div>
-        <div class='role-badge' id='role-badge'>ROLE: --</div>
-
-        <div style='text-align:center;'>
-            <span id='mode-label' class='unsecured-mode'>MODE: UNSECURED API</span>
+    <div class="portal-column">
+    <section class="card">
+        <div class="card-header">
+            <div>
+                <div class="title">Request Console</div>
+                <div class="subtitle">Select a target student and analyze the response</div>
+            </div>
+            <div class="role-badge" id="role-badge">Role: --</div>
         </div>
 
-        <div class='mode-toggle'>
-            <button class='mode-btn active-unsecured' id='btn-unsecured' onclick='setMode(false)'>UNSECURED MODE</button>
-            <button class='mode-btn' id='btn-secured' onclick='setMode(true)'>SECURED MODE</button>
+        <div class="mode-wrapper">
+            <div class="mode-status unsecured-mode" id="mode-status-indicator">
+                <div class="status-dot"></div>
+                <span id="mode-label">UNSECURED SYSTEM</span>
+            </div>
+            <div class="mode-note">The portal follows the backend mode you launch and the current session state.</div>
         </div>
 
-        <label>Select Student</label>
-        <select id='studentSelect'>
-            <option value='' disabled selected>Loading students...</option>
-        </select>
+        <div class="form-group">
+            <label for="studentSelect">Target Account ID</label>
+            <div class="select-wrapper">
+                <select id="studentSelect">
+                    <option value="" disabled selected>Loading network directory...</option>
+                </select>
+            </div>
+        </div>
 
-        <button id='fetchBtn' onclick='fetchGrade()'>FETCH MY GRADE</button>
-        <div class='log' id='log'>Ready. Select a student and click Fetch.</div>
-        <div class='result' id='result'></div>
-        <div class='footer-note'>Designed to feel like a modern product console while keeping the lab flow intact.</div>
+        <button id="fetchBtn" onclick="fetchGrade()">EXECUTE REQUEST</button>
+        
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="t-dot r"></div>
+                <div class="t-dot y"></div>
+                <div class="t-dot g"></div>
+                <div class="t-title">network_analyzer.sh</div>
+            </div>
+            <div class="log" id="log">System initialized. Waiting for execution...</div>
+        </div>
+        
+        <div class="footer-note">Designed to simulate a real-world API request lifecycle.</div>
+    </section>
+
+    </div>
+
+    <section class="card result-card">
+        <div class="card-header">
+            <div>
+                <div class="title">Student Record Details</div>
+                <div class="subtitle">Fetched result appears here as a dedicated detail card</div>
+            </div>
+            <div class="role-badge">DETAILS PANEL</div>
+        </div>
+        <div class="result-placeholder" id="resultEmpty">
+            Choose a student, keep the portal in the desired mode, and press execute to render the full record here.
+        </div>
+        <div class="result" id="result"></div>
     </section>
 </div>
-
-<script>
-    // ── CONFIG: mode-aware API targets ──
-    const API_BASE_SECURED = 'http://127.0.0.1:5000';
-    const API_BASE_UNSECURED = 'http://192.168.191.1:5000';
-    const SECRET_KEY = 'infosec-hmac-secret-2024';   // Must match config.py
-    let securedMode = Boolean(localStorage.getItem('AUTH_TOKEN')) || localStorage.getItem('PORTAL_MODE') === 'secured';
-
-    function getApiBaseForMode(secured) {
-        return secured ? API_BASE_SECURED : API_BASE_UNSECURED;
-    }
-
-    function getAuthHeadersForMode(secured) {
-        const headers = { 'Content-Type': 'application/json' };
-        const authToken = localStorage.getItem('AUTH_TOKEN');
-        if (secured && authToken) {
-            headers['X-Auth-Token'] = authToken;
-            headers['Authorization'] = `Bearer ${authToken}`;
-        }
-        return headers;
-    }
-
-    async function logout() {
-        if (!securedMode) {
-            window.location.href = 'login.html';
-            return;
-        }
-        await fetch(`${getApiBaseForMode(securedMode)}/api/auth/logout`, {
-            method: 'POST',
-            headers: getAuthHeadersForMode(securedMode),
-            credentials: 'include'
-        });
-        localStorage.removeItem('AUTH_TOKEN');
-        window.location.href = 'login.html';
-    }
-
-    async function requireAuth() {
-        const response = await fetch(`${getApiBaseForMode(securedMode)}/api/auth/me`, {
-            method: 'GET',
-            headers: getAuthHeadersForMode(securedMode),
-            credentials: 'include'
-        });
-        const me = await response.json().catch(() => ({}));
-        if (response.ok) {
-            document.getElementById('role-badge').textContent = `ROLE: ${me.role || '--'}`;
-            return true;
-        }
-        window.location.href = 'login.html';
-        return false;
-    }
-
-    function log(msg) {
-        const el = document.getElementById('log');
-        el.textContent += '\n' + new Date().toLocaleTimeString() + ' > ' + msg;
-        el.scrollTop = el.scrollHeight;
-    }
-
-    function setMode(secured) {
-        securedMode = secured;
-        localStorage.setItem('PORTAL_MODE', secured ? 'secured' : 'unsecured');
-        const label = document.getElementById('mode-label');
-        const btnU = document.getElementById('btn-unsecured');
-        const btnS = document.getElementById('btn-secured');
-        if (secured) {
-            label.textContent = 'MODE: SECURED API';
-            label.className = 'secured-mode';
-            btnS.className = 'mode-btn active-secured';
-            btnU.className = 'mode-btn';
-            log('[MODE] Switched to SECURED API – payload signing active');
-        } else {
-            label.textContent = 'MODE: UNSECURED API';
-            label.className = 'unsecured-mode';
-            btnU.className = 'mode-btn active-unsecured';
-            btnS.className = 'mode-btn';
-            log('[MODE] Switched to UNSECURED API – no payload protection');
-        }
-    }
-
-    // HMAC-SHA256 signing using Web Crypto API
-    async function signPayload(payload) {
-        const withTimestamp = { ...payload, timestamp: Math.floor(Date.now() / 1000) };
-        const sorted = JSON.stringify(withTimestamp, Object.keys(withTimestamp).sort());
-        const key = await crypto.subtle.importKey(
-            'raw',
-            new TextEncoder().encode(SECRET_KEY),
-            { name: 'HMAC', hash: 'SHA-256' },
-            false,
-            ['sign']
-        );
-        const signatureBuffer = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(sorted));
-        const hex = Array.from(new Uint8Array(signatureBuffer))
-            .map(b => b.toString(16).padStart(2, '0'))
-            .join('');
-        return { ...withTimestamp, signature: hex };
-    }
-
-    async function fetchGrade() {
-        const studentId = document.getElementById('studentSelect').value;
-        const resultEl = document.getElementById('result');
-        resultEl.style.display = 'none';
-        if (!studentId) {
-            log('[ERROR] Please select a student before fetching.');
-            return;
-        }
-        log(`[REQUEST] Fetching grade for student: ${studentId}`);
-        log(`[REQUEST] Mode: ${securedMode ? 'SECURED (signed)' : 'UNSECURED (no signature)'}`);
-
-        let payload = { student_id: studentId };
-        if (securedMode) {
-            payload = await signPayload(payload);
-            log('[SECURITY] Payload signed with HMAC-SHA256');
-            log('[SECURITY] Signature: ' + payload.signature.substring(0,32) + '...');
-        }
-        log('[NETWORK] Sending POST to /api/student...');
-
-        try {
-            const response = await fetch(`${getApiBaseForMode(securedMode)}/api/student`, {
-                method: 'POST',
-                headers: getAuthHeadersForMode(securedMode),
-                credentials: 'include',
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            log(`[RESPONSE] HTTP ${response.status}`);
-            log('[RESPONSE] ' + JSON.stringify(data));
-
-            if (response.status === 403) {
-                resultEl.className = 'result blocked';
-                resultEl.style.display = 'block';
-                resultEl.innerHTML = `
-                    <h3 style='color:#E94560'>ATTACK BLOCKED BY SECURITY MIDDLEWARE</h3>
-                    <div class='field'><span>Reason</span><span class='val' style='color:#E94560'>${data.reason}</span></div>
-                    <div class='field'><span>Status</span><span class='val' style='color:#E94560'>${data.status}</span></div>
-                `;
-            } else if (response.ok) {
-                const gradeClass = data.grade.startsWith('A') ? 'grade-A' : data.grade === 'F' ? 'grade-F' : 'grade-B';
-                const warning = (data.student_id !== studentId)
-                    ? `<div class='warning'>ATTACK SUCCESSFUL: You requested ${studentId} but got ${data.student_id} data!</div>`
-                    : '';
-                resultEl.className = 'result success';
-                resultEl.style.display = 'block';
-                resultEl.innerHTML = `
-                    ${warning}
-                    <h3 style='color:#0F3460'>Student Record</h3>
-                    <div class='field'><span>Student ID</span><span class='val'>${data.student_id}</span></div>
-                    <div class='field'><span>Name</span><span class='val'>${data.name}</span></div>
-                    <div class='field'><span>Course</span><span class='val'>${data.course}</span></div>
-                    <div class='field'><span>Grade</span><span class='val ${gradeClass}'>${data.grade}</span></div>
-                    <div class='field'><span>Marks</span><span class='val'>${data.marks}/100</span></div>
-                    <div class='field'><span>GPA</span><span class='val'>${data.gpa}/4.0</span></div>
-                    ${data.security ? `<div class='field'><span>Security</span><span class='val' style='color:#00B894'>${data.security}</span></div>` : ''}
-                `;
-            }
-        } catch(err) {
-            log('[ERROR] Could not connect to API: ' + err.message);
-            log('[CHECK] Is the Flask API running on Windows?');
-        }
-    }
-
-    async function loadStudents() {
-        const select = document.getElementById('studentSelect');
-        log('[INIT] Loading students from database...');
-        try {
-            const response = await fetch(`${getApiBaseForMode(securedMode)}/api/students`, {
-                headers: getAuthHeadersForMode(securedMode),
-                credentials: 'include'
-            });
-            const data = await response.json();
-            if (!response.ok || !data.students) {
-                throw new Error('Invalid student list response');
-            }
-
-            select.innerHTML = '';
-            data.students.forEach((student, index) => {
-                const option = document.createElement('option');
-                option.value = student.id;
-                const suffix = index === 0 ? ' (My Account)' : '';
-                option.textContent = `${student.id} – ${student.name}${suffix}`;
-                select.appendChild(option);
-            });
-            log(`[INIT] Loaded ${data.students.length} students from DB.`);
-        } catch (err) {
-            select.innerHTML = '<option value="" disabled selected>Failed to load students</option>';
-            log('[ERROR] Failed to load students: ' + err.message);
-        }
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-        setMode(securedMode);
-        if (securedMode) {
-            const ok = await requireAuth();
-            if (!ok) {
-                return;
-            }
-        } else {
-            document.getElementById('role-badge').textContent = 'ROLE: guest';
-        }
-        loadStudents();
-    });
-</script>
 </body>
 </html>

@@ -4,10 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Signup</title>
-    <link rel="stylesheet" href="app.css?v=20260529" />
+    <link rel="stylesheet" href="signup.css?v=20260529" />
     <script src="app.js?v=20260529" defer></script>
+    <script src="signup.js?v=20260529" defer></script>
 </head>
 <body>
+<div class="app-shell">
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">U</div>
+            <div class="brand-text">
+                <div>UniShield Academy</div>
+                <span>School management + API payload integrity</span>
+            </div>
+        </div>
+        <nav class="nav">
+            <a href="landing.html">Landing</a>
+            <a href="student_portal.html">Student Portal</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="admin.html">Admin</a>
+            <a href="login.html">Login</a>
+            <a class="active" href="signup.html">Signup</a>
+        </nav>
+    </header>
+
 <div class="auth-shell">
     <section class="auth-hero animate-in">
         <span class="eyebrow">Create a management account</span>
@@ -20,6 +40,20 @@
             <span class="stat-chip">Signed signup payloads</span>
             <span class="stat-chip">Role-based access</span>
             <span class="stat-chip">Replay protection</span>
+        </div>
+        <div class="mini-stats" style="margin-top: 22px;">
+            <div class="mini-stat">
+                <strong>PKI</strong>
+                <span>trusted sessions</span>
+            </div>
+            <div class="mini-stat">
+                <strong>SIG</strong>
+                <span>payload integrity</span>
+            </div>
+            <div class="mini-stat">
+                <strong>ADMIN</strong>
+                <span>auto role mapping</span>
+            </div>
         </div>
         <div class="content-grid" style="margin-top: 26px;">
             <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
@@ -59,77 +93,6 @@
         </div>
     </section>
 </div>
-
-<script>
-    async function signup() {
-        const notice = document.getElementById('notice');
-        const error = document.getElementById('error');
-        notice.classList.add('hidden');
-        error.classList.add('hidden');
-        error.textContent = '';
-
-        const full_name = document.getElementById('full_name').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const button = document.getElementById('signupBtn');
-
-        const health = await UniShield.resolveApiBase(true, 'secured');
-        if (!health) {
-            notice.textContent = 'API not reachable. Start the secured Flask server first.';
-            notice.classList.remove('hidden');
-            return;
-        }
-        if (health.mode === 'UNSECURED') {
-            notice.textContent = 'Signup is only available in secured mode. Start app_secured.py to continue.';
-            notice.classList.remove('hidden');
-            button.disabled = true;
-            return;
-        }
-
-        if (!full_name || !email || !password) {
-            error.textContent = 'Please fill in all fields.';
-            error.classList.remove('hidden');
-            return;
-        }
-
-        try {
-            button.disabled = true;
-            button.textContent = 'Creating...';
-            const result = await UniShield.apiRequest('/api/auth/signup', {
-                method: 'POST',
-                body: { full_name, email, password }
-            });
-
-            if (!result.ok) {
-                throw new Error(result.data.error || `HTTP ${result.status}`);
-            }
-
-            UniShield.setAuthToken(result.data.auth_token || '');
-            localStorage.setItem('ACTIVE_USER_ROLE', result.data.role || '');
-            window.location.href = 'dashboard.html';
-        } catch (err) {
-            error.textContent = err.message || 'Signup failed.';
-            error.classList.remove('hidden');
-        } finally {
-            button.disabled = false;
-            button.textContent = 'Create Account';
-        }
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-        const health = await UniShield.resolveApiBase(true, 'secured');
-        const notice = document.getElementById('notice');
-        if (!health) {
-            notice.textContent = 'API not reachable yet. Please start the secured server.';
-            notice.classList.remove('hidden');
-            return;
-        }
-        if (health.mode === 'UNSECURED') {
-            notice.textContent = 'This page is disabled in unsecured mode because signup is part of the secured management workflow.';
-            notice.classList.remove('hidden');
-            document.getElementById('signupBtn').disabled = true;
-        }
-    });
-</script>
+</div>
 </body>
 </html>
