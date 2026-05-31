@@ -2,7 +2,7 @@
     const API_BASE_SECURED = 'http://127.0.0.1:5000';
     const API_BASE_UNSECURED = 'http://192.168.191.1:5000';
     const SECRET_KEY = 'infosec-hmac-secret-2024';   // Must match config.py
-    let securedMode = localStorage.getItem('PORTAL_MODE') === 'secured';
+    let securedMode = false;
 
     function getApiBaseForMode(secured) {
         return secured ? API_BASE_SECURED : API_BASE_UNSECURED;
@@ -18,31 +18,85 @@
         return headers;
     }
 
+    async function probeHealth(base) {
+        try {
+            const response = await fetch(`${base}/api/health`, {
+                method: 'GET',
+                credentials: 'include',
+                cache: 'no-store'
+            });
+            if (!response.ok) {
+                return null;
+            }
+            return await response.json();
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function detectBackendMode() {
+        const storedMode = localStorage.getItem('PORTAL_MODE');
+        const unsecuredHealth = await probeHealth(API_BASE_UNSECURED);
+        const securedHealth = await probeHealth(API_BASE_SECURED);
+
+        if (storedMode === 'secured' && securedHealth && securedHealth.mode === 'SECURED') {
+            return { secured: true, health: securedHealth };
+        }
+
+        if (unsecuredHealth && unsecuredHealth.mode === 'UNSECURED') {
+            return { secured: false, health: unsecuredHealth };
+        }
+
+        if (securedHealth && securedHealth.mode === 'SECURED') {
+            return { secured: true, health: securedHealth };
+        }
+
+        if (storedMode === 'secured' && securedHealth) {
+            return { secured: true, health: securedHealth };
+        }
+
+        return unsecuredHealth
+            ? { secured: false, health: unsecuredHealth }
+            : securedHealth
+                ? { secured: true, health: securedHealth }
+                : null;
+    }
+
     async function logout() {
         if (!securedMode) {
+            localStorage.removeItem('AUTH_TOKEN');
+            localStorage.setItem('PORTAL_MODE', 'unsecured');
             window.location.href = 'login.html';
             return;
         }
-        await fetch(`${getApiBaseForMode(securedMode)}/api/auth/logout`, {
-            method: 'POST',
-            headers: getAuthHeadersForMode(securedMode),
-            credentials: 'include'
-        });
+        try {
+            await fetch(`${getApiBaseForMode(securedMode)}/api/auth/logout`, {
+                method: 'POST',
+                headers: getAuthHeadersForMode(securedMode),
+                credentials: 'include'
+            });
+        } catch (error) {
+            // Ignore logout transport failures; clear local state anyway.
+        }
         localStorage.removeItem('AUTH_TOKEN');
         localStorage.setItem('PORTAL_MODE', 'unsecured');
         window.location.href = 'login.html';
     }
 
     async function requireAuth() {
-        const response = await fetch(`${getApiBaseForMode(securedMode)}/api/auth/me`, {
-            method: 'GET',
-            headers: getAuthHeadersForMode(securedMode),
-            credentials: 'include'
-        });
-        const me = await response.json().catch(() => ({}));
-        if (response.ok) {
-            document.getElementById('role-badge').textContent = `Role: ${me.role || '--'}`;
-            return true;
+        try {
+            const response = await fetch(`${getApiBaseForMode(securedMode)}/api/auth/me`, {
+                method: 'GET',
+                headers: getAuthHeadersForMode(securedMode),
+                credentials: 'include'
+            });
+            const me = await response.json().catch(() => ({}));
+            if (response.ok) {
+                document.getElementById('role-badge').textContent = `Role: ${me.role || '--'}`;
+                return true;
+            }
+        } catch (error) {
+            // Fall through to redirect.
         }
         window.location.href = 'login.html';
         return false;
@@ -209,11 +263,17 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-        setMode(securedMode);
-        if (securedMode) {
-            const ok = await requireAuth();
-            if (!ok) return;
+        const detected = await detectBackendMode();
+        if (detected) {
+            setMode(detected.secured);
+            if (detected.secured) {
+                const ok = await requireAuth();
+                if (!ok) return;
+            } else {
+                document.getElementById('role-badge').textContent = 'Role: Guest (Unverified)';
+            }
         } else {
+            setMode(false);
             document.getElementById('role-badge').textContent = 'Role: Guest (Unverified)';
         }
         loadStudents();

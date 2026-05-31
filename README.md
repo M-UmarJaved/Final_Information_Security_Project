@@ -22,7 +22,7 @@ The frontend lives in `Desktop/` and includes:
 - Kali Linux VM with `mitmproxy`
 - Chrome on Windows
 - The `ZeroOmega` browser extension, or Windows proxy settings
-- Both machines on the same VMware / host-only network
+- Both machines on the same network
 
 ## Project files
 
@@ -58,12 +58,12 @@ python -c "from database import init_db; init_db()"
 
 These are the values currently configured in `config.py`:
 
-- Windows host IP: `192.168.191.1`
+- Windows host IP: `10.5.154.161`
 - Kali IP: `192.168.191.129`
 - Flask API port: `5000`
 - mitmproxy port: `8080`
 
-If your VM network differs, update `config.py` before running the demo.
+If your VM or hotspot network differs, update `config.py` before running the demo.
 
 ## Start the frontend
 
@@ -78,7 +78,7 @@ Open the site in Chrome:
 
 - `http://localhost:5500/landing.html`
 
-For interception demos, you can also open the site through the Windows host IP if you want to avoid localhost bypass behavior in the browser.
+For interception demos, it is often better to use the Windows Wi-Fi IP for API traffic instead of relying on `localhost`, because browsers may bypass the proxy for local addresses.
 
 ## Chrome and proxy setup
 
@@ -103,7 +103,7 @@ The attack demo needs Chrome traffic to go through Kali.
 4. Set:
    - Address: `192.168.191.129`
    - Port: `8080`
-5. If you want Chrome to proxy local lab traffic too, do not bypass local addresses.
+5. Do not bypass local addresses if you want Chrome to proxy the lab traffic too.
 
 ## Install the mitmproxy certificate
 
@@ -147,12 +147,10 @@ Open the portal:
 - `http://localhost:5500/dashboard.html`
 - `http://localhost:5500/admin.html`
 
-If you want Kali to see the live API request, make sure the browser proxy is active and the portal is using the current API base. The unsecured mode is designed to be interception-friendly.
-
 ## Phase 1 demo flow
 
 1. Open `student_portal.html`.
-2. Keep the portal in `UNSECURED SYSTEM`.
+2. Keep the backend in `UNSECURED SYSTEM`.
 3. Click fetch on a student.
 4. In Kali, pause the `POST /api/student` flow.
 5. Change `student_id` or the response JSON.
@@ -226,9 +224,9 @@ If you want a fresh demo database:
 
 ## Troubleshooting
 
-### `OPTIONS /api/auth/me` returns `404` in unsecured mode
+### `OPTIONS /api/auth/me` or `GET /api/auth/me` appears in unsecured mode
 
-That usually means the login page or portal is still trying to use secure auth state.
+That usually means stale browser state is still pointing the portal at secure mode.
 
 Fix:
 

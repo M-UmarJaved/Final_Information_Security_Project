@@ -63,31 +63,31 @@ This step is done by you manually in VirtualBox. No code required.
 
 ip addr show
 
-Look for the inet line under eth0 or enp0s3. It will look like 192.168.56.101 - write this down. This is your KALI_IP.
+Look for the inet line under eth0 or enp0s3. It will look like 192.168.191.129 - write this down. This is your KALI_IP.
 
 - On Windows, open Command Prompt and run:
 
 ipconfig
 
-Look for VirtualBox Host-Only Network adapter. Note the IPv4 address - this is your WINDOWS_IP (usually 192.168.56.1). Write this down.
+Look for VirtualBox Host-Only Network adapter. Note the IPv4 address - this is your WINDOWS_IP (usually 192.168.191.1). Write this down.
 
 ## **2.2 Test the Connection**
 
 From Kali terminal, ping Windows to confirm they can talk:
 
-ping 192.168.56.1
+ping 192.168.191.1
 
 You should see replies. If not, check Windows Firewall - temporarily disable it for the demo.
 
-| **WINDOWS_IP** | 192.168.56.1 (your actual VirtualBox Host-Only IP - check with ipconfig) |
+| **WINDOWS_IP** | 192.168.191.1 (your actual VirtualBox Host-Only IP - check with ipconfig) |
 | -------------- | ------------------------------------------------------------------------ |
-| **KALI_IP**    | 192.168.56.101 (your actual Kali IP - check with ip addr show)           |
+| **KALI_IP**    | 192.168.191.129 (your actual Kali IP - check with ip addr show)           |
 | **API Port**   | 5000 (Flask default)                                                     |
 | **Proxy Port** | 8080 (mitmproxy default)                                                 |
 
 **IMPORTANT**
 
-Replace 192.168.56.1 and 192.168.56.101 with YOUR actual IP addresses everywhere in this guide. They may be different on your machine.
+Replace 192.168.191.1 and 192.168.191.129 with YOUR actual IP addresses everywhere in this guide. They may be different on your machine.
 
 # **3\. Backend API - Flask + SQLite (Windows)**
 
@@ -127,7 +127,7 @@ Create this file as C:\\student_api\\config.py
 
 \# config.py
 
-WINDOWS_IP = '192.168.56.1' # Replace with your actual Windows IP
+WINDOWS_IP = '192.168.191.1' # Replace with your actual Windows IP
 
 API_PORT = 5000
 
@@ -655,7 +655,7 @@ SECURED MODE
 
 // ── CONFIG: Change WINDOWS_IP to your actual IP ──
 
-const WINDOWS_IP = '192.168.56.1';
+const WINDOWS_IP = '192.168.191.1';
 
 const API_BASE = \`http://\${WINDOWS_IP}:5000\`;
 
@@ -891,7 +891,7 @@ ORIGINAL_ID = 'S001' # Victim student ID
 
 INJECT_ID = 'S002' # Attacker wants this student's data
 
-WINDOWS_IP = '192.168.56.1' # Flask API server IP
+WINDOWS_IP = '192.168.191.1' # Flask API server IP
 
 \# ───────────────────────────────────────────────────────────
 
@@ -1002,7 +1002,7 @@ Now you need to make the web app's API calls go THROUGH Kali. You have two optio
 On Windows, open Chrome settings → System → Open computer proxy settings → Manual proxy setup:
 
 - Turn ON Use a proxy server
-- Address: 192.168.56.101 (your KALI_IP)
+- Address: 192.168.191.129 (your KALI_IP)
 - Port: 8080
 - Click Save
 
@@ -1030,7 +1030,7 @@ Do this BEFORE Sir arrives:
 
 - Windows: Flask API running - python app_unsecured.py - terminal shows 'UNSECURED API running'
 - Kali VM: mitmproxy attack script running - mitmdump -s ~/intercept_grade.py --listen-port 8080
-- Windows Chrome: Proxy set to 192.168.56.101:8080 (Kali IP)
+- Windows Chrome: Proxy set to 192.168.191.129:8080 (Kali IP)
 - student_portal.html open in Chrome - showing UNSECURED MODE
 - Kali terminal visible on screen (split screen or second monitor)
 
@@ -1100,7 +1100,7 @@ mitmdump -s ~/intercept_grade.py --listen-host 0.0.0.0 --listen-port 8080
 
 \# To verify Kali can reach the Windows API (run in separate Kali terminal):
 
-curl <http://192.168.56.1:5000/api/health>
+curl <http://192.168.191.1:5000/api/health>
 
 ## **7.3 Kali - Manual Payload Test with curl**
 
@@ -1108,7 +1108,7 @@ You can also show the attack purely from Kali command line - very impressive:
 
 \# Send a direct API request from Kali (bypassing proxy)
 
-curl -s -X POST <http://192.168.56.1:5000/api/student> \\
+curl -s -X POST <http://192.168.191.1:5000/api/student> \\
 
 \-H 'Content-Type: application/json' \\
 
@@ -1120,7 +1120,7 @@ This shows Kali directly retrieving Sara's (Grade A) data - proving the unsecure
 
 \# Try direct attack on secured API (no valid signature)
 
-curl -s -X POST <http://192.168.56.1:5000/api/student> \\
+curl -s -X POST <http://192.168.191.1:5000/api/student> \\
 
 \-H 'Content-Type: application/json' \\
 
@@ -1194,7 +1194,7 @@ intercept_grade.py (Kali)
 
 3\. Every import must be included, every function must be complete
 
-4\. Replace 192.168.56.1 with WINDOWS_IP and 192.168.56.101 with KALI_IP
+4\. Replace 192.168.191.1 with WINDOWS_IP and 192.168.191.129 with KALI_IP
 
 wherever they appear - keep them as variables in config.py
 

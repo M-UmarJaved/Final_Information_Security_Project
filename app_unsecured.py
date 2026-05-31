@@ -51,6 +51,24 @@ def health():
     })
 
 
+@app.route('/api/auth/me', methods=['GET', 'OPTIONS'])
+def auth_me_unsecured():
+    return open_response({
+        'authenticated': False,
+        'mode': 'UNSECURED',
+        'role': 'guest',
+        'message': 'Authentication is disabled in unsecured mode'
+    }, 401)
+
+
+@app.route('/api/auth/logout', methods=['POST', 'OPTIONS'])
+def auth_logout_unsecured():
+    return open_response({
+        'ok': True,
+        'mode': 'UNSECURED'
+    })
+
+
 @app.route('/api/routes', methods=['GET'])
 def routes():
     return open_response({

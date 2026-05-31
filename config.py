@@ -2,7 +2,7 @@
 # Central configuration file for the API Security Lab
 
 # Network configuration
-WINDOWS_IP = '192.168.191.1'      # Your Windows host IP (VMware host-only / VMnet8)
+WINDOWS_IP = '10.5.154.161'       # Your Windows host IP on the university/mobile hotspot Wi-Fi
 KALI_IP    = '192.168.191.129'    # Your Kali Linux VM IP on the same network
 
 API_PORT = 5000
@@ -72,7 +72,7 @@ ENFORCE_API_KEY = True
 ENFORCE_IP_ALLOWLIST = True
 LMS_API_KEY = 'unishield-lms-key-2026'
 LMS_ALLOWED_IPS = [
-	'192.168.191.1',
+	'10.5.154.161',
 	'192.168.191.129',
 	'127.0.0.1',
 	'::1'
