@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Signup</title>
-    <link rel="stylesheet" href="signup.css?v=20260531" />
-    <script src="app.js?v=20260531" defer></script>
-    <script src="signup.js?v=20260531" defer></script>
+    <meta name="description" content="Create a management account for the UniShield Academy security lab to access role-based controls and signed API demos." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="app.css?v=20260601" />
+    <link rel="stylesheet" href="signup.css?v=20260601" />
+    <script src="app.js?v=20260601" defer></script>
+    <script src="signup.js?v=20260601" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -15,7 +19,7 @@
             <div class="brand-mark">U</div>
             <div class="brand-text">
                 <div>UniShield Academy</div>
-                <span>School management + API payload integrity</span>
+                <span>API payload integrity lab</span>
             </div>
         </div>
         <nav class="nav">
@@ -30,18 +34,18 @@
 
 <div class="auth-shell">
     <section class="auth-hero animate-in">
-        <span class="eyebrow">Create a management account</span>
+        <span class="eyebrow on-dark">Create a management account</span>
         <h1 class="title">Register a secure user for the school console.</h1>
         <p class="subtitle">
-            In secured mode, signup requests are signed before they leave the browser.
-            That means the same integrity control used for student records also protects account creation and admin operations.
+            In secured mode, signup requests are cryptographically signed before they leave the browser.
+            The same integrity control used for student records also protects account creation and admin operations.
         </p>
         <div class="stats-row">
             <span class="stat-chip">Signed signup payloads</span>
             <span class="stat-chip">Role-based access</span>
             <span class="stat-chip">Replay protection</span>
         </div>
-        <div class="mini-stats" style="margin-top: 22px;">
+        <div class="mini-stats" style="margin-top: 26px;">
             <div class="mini-stat">
                 <strong>PKI</strong>
                 <span>trusted sessions</span>
@@ -55,30 +59,30 @@
                 <span>auto role mapping</span>
             </div>
         </div>
-        <div class="content-grid" style="margin-top: 26px;">
-            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+        <div class="content-grid" style="margin-top: 28px;">
+            <div class="timeline-item" style="background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); color: white;">
                 <strong>Admin accounts</strong>
-                <span class="muted" style="color: rgba(255,255,255,0.78);">Use the configured admin email to auto-assign the admin role during evaluation.</span>
+                <span style="color: rgba(255,255,255,0.7); font-size:13px;">Use the configured admin email to auto-assign the admin role during evaluation.</span>
             </div>
-            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+            <div class="timeline-item" style="background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); color: white;">
                 <strong>Security story</strong>
-                <span class="muted" style="color: rgba(255,255,255,0.78);">A tampered signup body fails signature verification before it reaches business logic.</span>
+                <span style="color: rgba(255,255,255,0.7); font-size:13px;">A tampered signup body fails signature verification before it ever reaches business logic.</span>
             </div>
         </div>
     </section>
 
-    <section class="auth-card card animate-in">
+    <section class="auth-card animate-in" style="animation-delay:0.07s;">
         <span class="eyebrow">New user</span>
-        <h2 class="section-title" style="font-size: 26px; margin-top: 14px;">Create your account</h2>
-        <p class="muted">This form is used for the secured management demo and role-based evaluation.</p>
+        <h2 class="section-title" style="font-size: 26px; margin-top: 16px; letter-spacing:-0.01em;">Create your account</h2>
+        <p class="muted" style="margin-top:6px; margin-bottom:0; font-size:14px;">This form is used for the secured management demo and role-based evaluation.</p>
 
-        <div class="form-grid" style="margin-top: 22px;">
+        <div class="form-grid" style="margin-top: 28px;">
             <div class="field">
                 <label for="full_name">Full name</label>
-                <input class="input" id="full_name" type="text" placeholder="Your name" />
+                <input class="input" id="full_name" type="text" placeholder="Your full name" />
             </div>
             <div class="field">
-                <label for="email">Email</label>
+                <label for="email">Email address</label>
                 <input class="input" id="email" type="email" placeholder="you@university.edu" />
             </div>
             <div class="field">
@@ -88,8 +92,8 @@
             <button class="button primary" id="signupBtn" type="button" onclick="signup()">Create Account</button>
             <div class="notice hidden" id="notice"></div>
             <div class="error hidden" id="error"></div>
-            <div class="helper">Already have an account? <a href="login.html">Sign in</a></div>
-            <a class="button ghost" href="landing.html">Back to landing</a>
+            <div class="helper">Already have an account? <a href="login.html">Sign in here</a></div>
+            <a class="button ghost" href="landing.html">← Back to landing</a>
         </div>
     </section>
 </div>

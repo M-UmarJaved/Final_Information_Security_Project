@@ -1,11 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap");
-@import url("./app.css?v=20260529");
+/* dashboard.css – extra rules beyond app.css */
 
-/* Page-specific overrides for dashboard */
-.bar-row {
-            display: grid;
-            grid-template-columns: 80px 1fr 48px;
-            gap: 12px;
-            align-items: center;
-            padding: 10px 0;
-        }
+/* Metric cards get colour-differentiated top borders */
+.metric-card:nth-child(1)::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
+.metric-card:nth-child(2)::before { background: linear-gradient(90deg, #0ea5e9, #38bdf8); }
+.metric-card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.metric-card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.metric-card:nth-child(5)::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.metric-card:nth-child(6)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.metric-card:nth-child(7)::before { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+.metric-card:nth-child(8)::before { background: linear-gradient(90deg, #64748b, #94a3b8); }
+
+/* Log rows in the dashboard audit trail */
+.log-row {
+    font-size: 12px;
+    font-family: 'Fira Code', 'Courier New', monospace;
+}
+
+.log-row .row-title { font-size: 12px; }
+.log-row .row-subtitle { font-size: 11px; color: var(--muted); }

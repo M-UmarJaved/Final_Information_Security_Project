@@ -1,4 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap");
-@import url("./app.css?v=20260529");
+/* signup.css – extra rules beyond app.css */
 
-/* Page-specific overrides for signup */
+/* Position the topbar inside the app-shell */
+.app-shell > header.topbar {
+    position: sticky;
+    top: 16px;
+    z-index: 100;
+    margin-bottom: 28px;
+}
+
+/* The auth-shell sits directly inside the .app-shell */
+.auth-shell {
+    width: 100%;
+    margin: 0;
+}

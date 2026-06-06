@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Security Middleware Lab</title>
-    <link rel="stylesheet" href="landing.css?v=20260531" />
-    <script src="app.js?v=20260531" defer></script>
-    <script src="landing.js?v=20260531" defer></script>
+    <meta name="description" content="UniShield Academy – a live API payload interception and security middleware demonstration for Information Security labs." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="app.css?v=20260601" />
+    <link rel="stylesheet" href="landing.css?v=20260601" />
+    <script src="app.js?v=20260601" defer></script>
+    <script src="landing.js?v=20260601" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -15,7 +19,7 @@
             <div class="brand-mark">U</div>
             <div class="brand-text">
                 <div>UniShield Academy</div>
-                <span>School management + API payload integrity</span>
+                <span>API payload integrity lab</span>
             </div>
         </div>
         <nav class="nav">
@@ -32,7 +36,7 @@
     <section class="hero animate-in">
         <div class="hero-grid">
             <div>
-                <span class="eyebrow">InfoSec Lab • Middleware showcase</span>
+                <span class="eyebrow on-dark">InfoSec Lab &bull; Middleware Showcase</span>
                 <h1 class="title">A polished school platform that proves why payload integrity matters.</h1>
                 <p class="subtitle">
                     UniShield Academy combines a believable school management system, live analytics, admin controls,
@@ -44,19 +48,19 @@
                     <span class="stat-chip">Phase 2: Signed &amp; verified</span>
                     <span class="stat-chip">Student + Admin attack paths</span>
                 </div>
-                <div class="stats-row" style="margin-top: 22px;">
+                <div class="stats-row" style="margin-top: 26px; gap: 12px;">
                     <a class="button primary" href="student_portal.html">Open Student Portal</a>
-                    <a class="button secondary" href="dashboard.html">Open Analytics</a>
-                    <a class="button ghost" href="login.html">Management Login</a>
+                    <a class="button ghost" style="color:rgba(255,255,255,0.85); border-color:rgba(255,255,255,0.25); background:rgba(255,255,255,0.1);" href="dashboard.html">Open Analytics</a>
+                    <a class="button ghost" style="color:rgba(255,255,255,0.75); border-color:rgba(255,255,255,0.15); background:transparent;" href="login.html">Management Login</a>
                 </div>
-                <div class="footer-note">Live API status appears below once the backend is running.</div>
+                <p class="footer-note" style="color:rgba(255,255,255,0.4); text-align:left; margin-top:18px;">Live API status appears below once the backend is running.</p>
             </div>
 
-            <div class="card soft">
+            <div class="card soft" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.12);">
                 <div class="hero-accent">
-                    <span class="eyebrow dark">Live system snapshot</span>
-                    <h3 class="section-title" style="color: white; margin-bottom: 0;">Everything the teacher can verify at a glance</h3>
-                    <p class="subtitle">A clean summary of the backend state, the attack surface, and the security story.</p>
+                    <span class="eyebrow on-dark">Live system snapshot</span>
+                    <h3 class="section-title" style="color:white; margin-bottom:0; font-size:18px;">Everything the teacher can verify at a glance</h3>
+                    <p style="color:rgba(255,255,255,0.65); font-size:13.5px; line-height:1.6; margin:0;">A clean summary of the backend state, the attack surface, and the security story.</p>
                     <div class="mini-stats">
                         <div class="mini-stat">
                             <strong id="hero-routes">--</strong>
@@ -72,19 +76,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="split-stack" style="margin-top: 18px;">
-                    <div class="mini-note" id="system-status">Checking API health...</div>
+                <div style="margin-top: 16px; display: grid; gap: 10px;">
+                    <div class="mini-note" id="system-status" style="background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.75); border-color:rgba(255,255,255,0.1);">Checking API health...</div>
                     <div class="timeline" id="timeline"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="content-grid section-shell">
+    <section class="content-grid section-shell" style="margin-top:28px;">
         <div class="section-header">
             <div>
                 <span class="eyebrow">Executive summary</span>
-                <h2 class="section-title" style="font-size: 24px;">The platform feels like a real product, not a lab mockup.</h2>
+                <h2 class="section-title" style="font-size: 26px; margin-top:8px;">The platform feels like a real product, not a lab mockup.</h2>
             </div>
             <p class="section-copy">We keep the demo believable: management metrics, school modules, and a visual story that makes the security contrast obvious.</p>
         </div>
@@ -95,17 +99,17 @@
                 <div class="value" id="metric-routes">--</div>
                 <div class="muted">API routes exposed for the demo</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.05s">
                 <div class="label">School modules</div>
                 <div class="value" id="metric-modules">--</div>
                 <div class="muted">Student, academic, finance, and security</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.10s">
                 <div class="label">Integrity mode</div>
                 <div class="value" id="metric-mode">--</div>
                 <div class="muted">Request and response protection</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.15s">
                 <div class="label">Evaluation story</div>
                 <div class="value">MITM → Blocked</div>
                 <div class="muted">Same attack, different outcome</div>
@@ -115,7 +119,7 @@
         <div class="layout-2">
             <article class="card animate-in">
                 <h3 class="section-title">What the teacher will see</h3>
-                <div class="timeline">
+                <div class="timeline" style="margin-top:16px;">
                     <div class="timeline-item">
                         <strong>1. Real school management</strong>
                         <span class="muted">Students, courses, faculty, attendance, fees, and announcements.</span>
@@ -131,9 +135,9 @@
                 </div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.07s">
                 <h3 class="section-title">Demo sequence</h3>
-                <div class="timeline">
+                <div class="timeline" style="margin-top:16px;">
                     <div class="timeline-item">
                         <strong>Phase 1</strong>
                         <span class="muted">Open unsecured API, intercept the request in Kali, and show altered student/admin data.</span>
@@ -152,54 +156,54 @@
 
         <article class="card animate-in">
             <h3 class="section-title">School modules</h3>
-            <div class="module-grid" id="module-grid">
+            <div class="module-grid" id="module-grid" style="margin-top:18px;">
                 <div class="mini-note">Loading module cards...</div>
             </div>
         </article>
 
-        <div class="section-header">
+        <div class="section-header" style="margin-top:8px;">
             <div>
                 <span class="eyebrow">Testimonials</span>
-                <h2 class="section-title" style="font-size: 24px;">What this demo communicates in one glance</h2>
+                <h2 class="section-title" style="font-size: 22px; margin-top:8px;">What this demo communicates in one glance</h2>
             </div>
             <p class="section-copy">These cards make the project feel like a branded product pitch instead of just a proof-of-concept.</p>
         </div>
 
         <div class="testimonial-grid">
             <article class="testimonial-card animate-in">
-                <div class="testimonial-quote">“The school app looks complete enough for management, and the attack/defense contrast is easy to explain live.”</div>
+                <div class="testimonial-quote">&ldquo;The school app looks complete enough for management, and the attack/defense contrast is easy to explain live.&rdquo;</div>
                 <div class="testimonial-meta">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div class="avatar">T</div>
                         <div>
                             <strong>Teacher perspective</strong>
-                            <div class="muted">Demo evaluation focus</div>
+                            <div class="muted" style="font-size:12px;">Demo evaluation focus</div>
                         </div>
                     </div>
                     <span class="badge success">Clear impact</span>
                 </div>
             </article>
-            <article class="testimonial-card animate-in">
-                <div class="testimonial-quote">“Unsecured mode proves the risk, and secured mode shows the middleware doing real work instead of just hiding data.”</div>
+            <article class="testimonial-card animate-in" style="animation-delay:0.07s">
+                <div class="testimonial-quote">&ldquo;Unsecured mode proves the risk, and secured mode shows the middleware doing real work instead of just hiding data.&rdquo;</div>
                 <div class="testimonial-meta">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div class="avatar">D</div>
                         <div>
                             <strong>Defense narrative</strong>
-                            <div class="muted">Integrity protection</div>
+                            <div class="muted" style="font-size:12px;">Integrity protection</div>
                         </div>
                     </div>
                     <span class="badge warn">Security proof</span>
                 </div>
             </article>
-            <article class="testimonial-card animate-in">
-                <div class="testimonial-quote">“The UI now feels like a branded school platform, so the lab story can be presented confidently in front of the class.”</div>
+            <article class="testimonial-card animate-in" style="animation-delay:0.14s">
+                <div class="testimonial-quote">&ldquo;The UI now feels like a branded school platform, so the lab story can be presented confidently in front of the class.&rdquo;</div>
                 <div class="testimonial-meta">
                     <div style="display:flex; align-items:center; gap:12px;">
                         <div class="avatar">P</div>
                         <div>
                             <strong>Presentation value</strong>
-                            <div class="muted">Professional finish</div>
+                            <div class="muted" style="font-size:12px;">Professional finish</div>
                         </div>
                     </div>
                     <span class="badge">Polished</span>

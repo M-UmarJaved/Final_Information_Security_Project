@@ -3,7 +3,7 @@ async function renderLanding() {
         const timeline = document.getElementById('timeline');
         const moduleGrid = document.getElementById('module-grid');
 
-        const health = await UniShield.resolveApiBase(true, 'unsecured');
+        const health = await UniShield.resolveApiBase(true);
         if (!health) {
             status.innerHTML = 'API not reachable. Start <strong>app_unsecured.py</strong> or <strong>app_secured.py</strong>.';
             timeline.innerHTML = `

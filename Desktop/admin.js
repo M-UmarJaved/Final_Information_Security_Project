@@ -154,7 +154,7 @@ let currentHealth = null;
     }
 
     async function loadAdminConsole() {
-        currentHealth = await UniShield.resolveApiBase(true, 'secured');
+        currentHealth = await UniShield.resolveApiBase(true);
         if (!currentHealth) {
             document.getElementById('admin-story').innerHTML = '<div class="warning">API not reachable. Start the Flask backend.</div>';
             return;

@@ -127,10 +127,23 @@
         }
     }
 
-    // HMAC-SHA256 signing using Web Crypto API
-    async function signPayload(payload) {
-        const withTimestamp = { ...payload, timestamp: Math.floor(Date.now() / 1000) };
-        const sorted = JSON.stringify(withTimestamp, Object.keys(withTimestamp).sort());
+    // HMAC-SHA256 with deep recursive key sort – matches middleware.py canonical form exactly
+    function sortValueDeep(value) {
+        if (Array.isArray(value)) return value.map(sortValueDeep);
+        if (value && typeof value === 'object' && value.constructor === Object) {
+            return Object.keys(value).sort().reduce((acc, k) => {
+                acc[k] = sortValueDeep(value[k]);
+                return acc;
+            }, {});
+        }
+        return value;
+    }
+
+    function canonicalJson(value) {
+        return JSON.stringify(sortValueDeep(value));
+    }
+
+    async function hmacHex(message) {
         const key = await crypto.subtle.importKey(
             'raw',
             new TextEncoder().encode(SECRET_KEY),
@@ -138,11 +151,16 @@
             false,
             ['sign']
         );
-        const signatureBuffer = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(sorted));
-        const hex = Array.from(new Uint8Array(signatureBuffer))
+        const signatureBuffer = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+        return Array.from(new Uint8Array(signatureBuffer))
             .map(b => b.toString(16).padStart(2, '0'))
             .join('');
-        return { ...withTimestamp, signature: hex };
+    }
+
+    async function signPayload(payload) {
+        const withTimestamp = { ...payload, timestamp: Math.floor(Date.now() / 1000) };
+        const signature = await hmacHex(canonicalJson(withTimestamp));
+        return { ...withTimestamp, signature };
     }
 
     async function fetchGrade() {
@@ -191,19 +209,23 @@
                     </div>
                     <div class="result-body">
                         <div class="field"><span class="label">Detection</span><span class="val" style="color:var(--danger)">Signature Mismatch</span></div>
-                        <div class="field"><span class="label">Reason</span><span class="val" style="color:var(--danger)">${data.reason}</span></div>
+                        <div class="field"><span class="label">Reason</span><span class="val" style="color:var(--danger)">${data.reason || 'Payload integrity violation'}</span></div>
                         <div class="field"><span class="label">Status Code</span><span class="val" style="color:var(--danger)">403 FORBIDDEN</span></div>
                     </div>
                 `;
             } else if (response.ok) {
-                const gradeClass = data.grade.startsWith('A') ? 'grade-A' : data.grade === 'F' ? 'grade-F' : 'grade-B';
+                const gradeClass = data.grade && data.grade.startsWith('A') ? 'grade-A' : data.grade === 'F' ? 'grade-F' : 'grade-B';
                 const isAttack = (data.student_id !== studentId);
                 
                 const warningHTML = isAttack 
                     ? `<div class="warning-banner">
                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                         BOLA Attack Successful! Retrived ID: ${data.student_id} instead of yours.
+                         BOLA Attack Successful! Retrieved ID: ${data.student_id} instead of yours.
                        </div>` 
+                    : '';
+
+                const securedBadge = data.security && data.security.includes('VERIFIED')
+                    ? `<div class="field"><span class="label">Security</span><span class="val" style="color:var(--success-dark)">✓ ${data.security}</span></div>`
                     : '';
 
                 resultEl.className = 'result success';
@@ -222,9 +244,12 @@
                         <div class="field"><span class="label">Current Grade</span><span class="val ${gradeClass}">${data.grade}</span></div>
                         <div class="field"><span class="label">Marks</span><span class="val">${data.marks}/100</span></div>
                         <div class="field"><span class="label">GPA</span><span class="val">${data.gpa}/4.0</span></div>
-                        ${data.security ? `<div class="field"><span class="label">Security Info</span><span class="val" style="color:var(--success)">${data.security}</span></div>` : ''}
+                        ${securedBadge}
                     </div>
                 `;
+            } else {
+                log(`[ERROR] Request failed with status ${response.status}`);
+                emptyEl.textContent = `Error: ${data.error || 'Request failed. Check the API logs.'}`;
             }
         } catch(err) {
             log('[CRITICAL] Network Error: ' + err.message);

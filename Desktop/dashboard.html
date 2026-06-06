@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css?v=20260531" />
-    <script src="app.js?v=20260531" defer></script>
-    <script src="dashboard.js?v=20260531" defer></script>
+    <meta name="description" content="UniShield Academy management analytics dashboard – student metrics, security telemetry, route catalog, and audit trail." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="app.css?v=20260601" />
+    <link rel="stylesheet" href="dashboard.css?v=20260601" />
+    <script src="app.js?v=20260601" defer></script>
+    <script src="dashboard.js?v=20260601" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -15,7 +19,7 @@
             <div class="brand-mark">U</div>
             <div class="brand-text">
                 <div>UniShield Academy</div>
-                <span>Management analytics and security telemetry</span>
+                <span>Management analytics &amp; security telemetry</span>
             </div>
         </div>
         <nav class="nav">
@@ -32,11 +36,11 @@
     <section class="hero animate-in">
         <div class="hero-grid">
             <div>
-                <span class="eyebrow">Security analytics</span>
+                <span class="eyebrow on-dark">Security analytics</span>
                 <h1 class="title">A live view of the school data, the API surface, and the defense layer.</h1>
                 <p class="subtitle">
                     This dashboard is the management-facing view of the project. It summarizes student records,
-                    academic operations, finance, and security controls using the same APIs that the student portal
+                    academic operations, finance, and security controls using the same APIs the student portal
                     and admin console depend on.
                 </p>
                 <div class="stats-row">
@@ -45,11 +49,11 @@
                     <span class="stat-chip" id="request-chip">Requests: --</span>
                 </div>
             </div>
-            <div class="card soft">
+            <div class="card soft" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.12);">
                 <div class="hero-accent">
-                    <span class="eyebrow dark">Management snapshot</span>
-                    <h3 class="section-title" style="color: white; margin-bottom: 0;">A compact view of the school and middleware health</h3>
-                    <p class="subtitle">These numbers help the teacher explain the school platform as a real product with live operational data.</p>
+                    <span class="eyebrow on-dark">Management snapshot</span>
+                    <h3 class="section-title" style="color: white; margin-bottom: 0; font-size:18px;">School and middleware health at a glance</h3>
+                    <p style="color:rgba(255,255,255,0.65); font-size:13.5px; line-height:1.6; margin:0;">These numbers help the teacher explain the platform as a real product with live operational data.</p>
                     <div class="mini-stats">
                         <div class="mini-stat">
                             <strong id="hero-students">--</strong>
@@ -65,7 +69,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="timeline" id="security-snapshot" style="margin-top: 18px;">
+                <div class="timeline" id="security-snapshot" style="margin-top: 16px;">
                     <div class="timeline-item"><strong>Loading...</strong><span class="muted">Fetching dashboard data and route map.</span></div>
                 </div>
             </div>
@@ -76,7 +80,7 @@
         <div class="section-header">
             <div>
                 <span class="eyebrow">Operational overview</span>
-                <h2 class="section-title" style="font-size: 24px;">Live metrics, charts, and audit trails in one place.</h2>
+                <h2 class="section-title" style="font-size: 24px; margin-top:8px;">Live metrics, charts, and audit trails in one place.</h2>
             </div>
             <p class="section-copy">This layout keeps the same clean card rhythm as the student portal so the whole app feels unified.</p>
         </div>
@@ -87,37 +91,37 @@
                 <div class="value" id="metric-students">--</div>
                 <div class="muted">Registered records</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.04s">
                 <div class="label">Faculty</div>
                 <div class="value" id="metric-faculty">--</div>
                 <div class="muted">Teaching staff</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.08s">
                 <div class="label">Courses</div>
                 <div class="value" id="metric-courses">--</div>
                 <div class="muted">Catalog items</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.12s">
                 <div class="label">Average GPA</div>
                 <div class="value" id="metric-gpa">--</div>
                 <div class="muted">Overall academic score</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.16s">
                 <div class="label">Attendance</div>
                 <div class="value" id="metric-attendance">--</div>
                 <div class="muted">Campus-wide average</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.20s">
                 <div class="label">Fee collection</div>
                 <div class="value" id="metric-fees">--</div>
                 <div class="muted">Paid vs total fees</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.24s">
                 <div class="label">API requests</div>
                 <div class="value" id="metric-requests">--</div>
                 <div class="muted">Logged requests</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.28s">
                 <div class="label">Security policies</div>
                 <div class="value" id="metric-policies">--</div>
                 <div class="muted">Controls in effect</div>
@@ -131,7 +135,7 @@
                 <div id="grade-chart" class="list-grid" style="margin-top: 16px;"></div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">Department breakdown</div>
                 <div class="row-subtitle">Course ownership across the campus.</div>
                 <div id="department-chart" class="list-grid" style="margin-top: 16px;"></div>
@@ -145,7 +149,7 @@
                 <div id="fee-chart" class="list-grid" style="margin-top: 16px;"></div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">At-risk students</div>
                 <div class="row-subtitle">Attendance and finance records that need attention.</div>
                 <div id="student-health" class="list-grid" style="margin-top: 16px;"></div>
@@ -159,7 +163,7 @@
                 <div id="route-list" class="list-grid" style="margin-top: 16px;"></div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">Recent API activity</div>
                 <div class="row-subtitle">Audit trail captured by the middleware.</div>
                 <div id="log-list" class="log-list" style="margin-top: 16px;"></div>
@@ -173,7 +177,7 @@
                 <div id="policy-list" class="list-grid" style="margin-top: 16px;"></div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">Announcements</div>
                 <div class="row-subtitle">Live campus notices from the school database.</div>
                 <div id="announcement-list" class="timeline" style="margin-top: 16px;"></div>

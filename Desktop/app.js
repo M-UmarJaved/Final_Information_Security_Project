@@ -12,6 +12,7 @@ window.UniShield = (() => {
         return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
     }
 
+    // Deep recursive key sorter – must match middleware.py's sort_keys=True behaviour
     function sortValue(value) {
         if (Array.isArray(value)) {
             return value.map(sortValue);
@@ -25,6 +26,7 @@ window.UniShield = (() => {
         return value;
     }
 
+    // Canonical JSON: deep-sorted keys, compact separators (no spaces)
     function canonicalJson(value) {
         return JSON.stringify(sortValue(value));
     }
@@ -54,24 +56,26 @@ window.UniShield = (() => {
         if (!payload || typeof payload !== 'object') {
             return { ok: false, reason: 'Invalid response payload' };
         }
+        // If no signature fields present, treat as unsigned (unsecured mode responses)
         if (!('signature' in payload) || !('timestamp' in payload)) {
             return { ok: true, payload };
         }
         if (typeof payload.signature !== 'string') {
             return { ok: false, reason: 'Invalid signature format' };
         }
+
         const payloadToVerify = clone(payload);
         const receivedSignature = payloadToVerify.signature;
         delete payloadToVerify.signature;
 
         const expectedSignature = await hmacHex(canonicalJson(payloadToVerify));
         if (receivedSignature !== expectedSignature) {
-            return { ok: false, reason: 'Signature mismatch – payload was tampered!' };
+            return { ok: false, reason: 'Response signature mismatch – response was tampered in transit!' };
         }
 
         const timestamp = Number(payloadToVerify.timestamp);
         if (!Number.isFinite(timestamp) || Math.abs((Date.now() / 1000) - timestamp) > 30) {
-            return { ok: false, reason: 'Request expired – possible replay attack' };
+            return { ok: false, reason: 'Response expired – possible replay attack' };
         }
 
         return { ok: true, payload: payloadToVerify };
@@ -193,12 +197,24 @@ window.UniShield = (() => {
                 data = { error: 'Invalid JSON response', raw: rawText };
             }
 
+            // In secure mode, verify response signature if present
             if (isSecureMode() && path !== '/api/health' && data && typeof data === 'object') {
                 if ('signature' in data && 'timestamp' in data) {
                     const verification = await verifySignedPayload(data);
-                    if (verification.ok) {
-                        data = verification.payload;
+                    if (!verification.ok) {
+                        // Return a tampered-response error that callers can display
+                        return {
+                            ok: false,
+                            status: 999,
+                            data: {
+                                error: 'RESPONSE INTEGRITY VIOLATION',
+                                reason: verification.reason,
+                                status: 'TAMPERED'
+                            },
+                            response
+                        };
                     }
+                    data = verification.payload;
                 }
             }
         }

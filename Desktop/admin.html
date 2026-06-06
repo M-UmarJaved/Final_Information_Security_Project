@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Admin Console</title>
-    <link rel="stylesheet" href="admin.css?v=20260531" />
-    <script src="app.js?v=20260531" defer></script>
-    <script src="admin.js?v=20260531" defer></script>
+    <meta name="description" content="UniShield Academy admin console – manage user roles, security policies, and view the full API attack surface." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="app.css?v=20260601" />
+    <link rel="stylesheet" href="admin.css?v=20260601" />
+    <script src="app.js?v=20260601" defer></script>
+    <script src="admin.js?v=20260601" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -15,7 +19,7 @@
             <div class="brand-mark">U</div>
             <div class="brand-text">
                 <div>UniShield Academy</div>
-                <span>Admin controls and policy management</span>
+                <span>Admin controls &amp; policy management</span>
             </div>
         </div>
         <nav class="nav">
@@ -32,7 +36,7 @@
     <section class="hero animate-in">
         <div class="hero-grid">
             <div>
-                <span class="eyebrow">Administrator workflow</span>
+                <span class="eyebrow on-dark">Administrator workflow</span>
                 <h1 class="title">Manage roles, policies, and the attack surface from one clean console.</h1>
                 <p class="subtitle">
                     This is the management-side view of the demo. In unsecured mode the role and policy endpoints are
@@ -44,11 +48,11 @@
                     <span class="stat-chip" id="route-chip">Routes: --</span>
                 </div>
             </div>
-            <div class="card soft">
+            <div class="card soft" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.12);">
                 <div class="hero-accent">
-                    <span class="eyebrow dark">Admin snapshot</span>
-                    <h3 class="section-title" style="color: white; margin-bottom: 0;">Policy and role controls in a single branded workspace</h3>
-                    <p class="subtitle">The same polished design keeps the teacher focused on the security story rather than the tooling.</p>
+                    <span class="eyebrow on-dark">Admin snapshot</span>
+                    <h3 class="section-title" style="color: white; margin-bottom: 0; font-size:18px;">Policy and role controls in a single branded workspace</h3>
+                    <p style="color:rgba(255,255,255,0.65); font-size:13.5px; line-height:1.6; margin:0;">The same polished design keeps the teacher focused on the security story rather than the tooling.</p>
                     <div class="mini-stats">
                         <div class="mini-stat">
                             <strong id="hero-users">--</strong>
@@ -64,10 +68,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="timeline" id="admin-story" style="margin-top: 18px;">
-                    <div class="timeline-item"><strong>Open console</strong><span class="muted">Adjust a user role or policy status from the browser.</span></div>
-                    <div class="timeline-item"><strong>Kali intercepts</strong><span class="muted">The proxy sees the JSON body and can try to rewrite the value.</span></div>
-                    <div class="timeline-item"><strong>Middleware verdict</strong><span class="muted">Signed requests and signed responses stop tampering in secured mode.</span></div>
+                <div class="timeline" id="admin-story" style="margin-top: 16px;">
+                    <div class="timeline-item" style="background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12); color:white;">
+                        <strong>Open console</strong>
+                        <span style="color:rgba(255,255,255,0.65); font-size:13px;">Adjust a user role or policy status directly from the browser.</span>
+                    </div>
+                    <div class="timeline-item" style="background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12); color:white;">
+                        <strong>Kali intercepts</strong>
+                        <span style="color:rgba(255,255,255,0.65); font-size:13px;">The proxy sees the JSON body and can try to rewrite the role or policy value.</span>
+                    </div>
+                    <div class="timeline-item" style="background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.12); color:white;">
+                        <strong>Middleware verdict</strong>
+                        <span style="color:rgba(255,255,255,0.65); font-size:13px;">Signed requests and signed responses stop tampering in secured mode.</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -77,7 +90,7 @@
         <div class="section-header">
             <div>
                 <span class="eyebrow">Admin overview</span>
-                <h2 class="section-title" style="font-size: 24px;">Role controls, policies, and the route surface in one clean workspace.</h2>
+                <h2 class="section-title" style="font-size: 24px; margin-top:8px;">Role controls, policies, and the route surface in one clean workspace.</h2>
             </div>
             <p class="section-copy">The admin console follows the same design language as the student portal so the demo feels like one product.</p>
         </div>
@@ -88,20 +101,20 @@
                 <div class="value" id="metric-users">--</div>
                 <div class="muted">Management accounts</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.06s">
                 <div class="label">Policies</div>
                 <div class="value" id="metric-policies">--</div>
                 <div class="muted">Security controls</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.12s">
                 <div class="label">Active admins</div>
                 <div class="value" id="metric-admins">--</div>
                 <div class="muted">Role-based access</div>
             </article>
-            <article class="card metric-card animate-in">
+            <article class="card metric-card animate-in" style="animation-delay:0.18s">
                 <div class="label">Route map</div>
                 <div class="value" id="metric-routes">--</div>
-                <div class="muted">API endpoints visible to the lab</div>
+                <div class="muted">API endpoints exposed to the lab</div>
             </article>
         </div>
 
@@ -114,9 +127,9 @@
                 </div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">Security policies</div>
-                <div class="row-subtitle">Enable or disable policies from the admin console.</div>
+                <div class="row-subtitle">Enable or disable middleware policies from the admin console.</div>
                 <div id="policy-list" class="table-grid" style="margin-top: 16px;">
                     <div class="mini-note">Loading policies...</div>
                 </div>
@@ -130,21 +143,21 @@
                 <div id="route-list" class="list-grid" style="margin-top: 16px;"></div>
             </article>
 
-            <article class="card animate-in">
+            <article class="card animate-in" style="animation-delay:0.06s">
                 <div class="row-title">Attack notes</div>
                 <div class="row-subtitle">What the teacher can verify during the live demo.</div>
                 <div class="timeline" style="margin-top: 16px;">
                     <div class="timeline-item">
                         <strong>Student-side attack</strong>
-                        <span class="muted">Modify `student_id` to retrieve a different learner’s grade and attendance summary.</span>
+                        <span class="muted">Modify <code style="background:var(--surface-2); padding:1px 5px; border-radius:4px; font-size:11px;">student_id</code> to retrieve a different learner&rsquo;s grade and attendance summary.</span>
                     </div>
                     <div class="timeline-item">
                         <strong>Admin-side attack</strong>
-                        <span class="muted">Rewrite the role or policy payload and show the middleware blocking the change.</span>
+                        <span class="muted">Rewrite the role or policy payload and show the middleware blocking the change in secured mode.</span>
                     </div>
                     <div class="timeline-item">
                         <strong>Secure mode</strong>
-                        <span class="muted">The same request and response are signed, verified, and logged.</span>
+                        <span class="muted">The same request and response are signed, verified, and logged — the attacker gets a 403 FORBIDDEN.</span>
                     </div>
                 </div>
             </article>

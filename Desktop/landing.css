@@ -1,4 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap");
-@import url("./app.css?v=20260529");
+/* landing.css – extra rules beyond app.css */
+/* Module cards get a colored top accent */
+.module-card {
+    position: relative;
+    overflow: hidden;
+    border-top: 3px solid transparent;
+    background-clip: padding-box;
+}
 
-/* Page-specific overrides for landing */
+.module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--brand-grad);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+}
+
+/* Testimonial cards on landing */
+.testimonial-card strong { color: var(--ink); }
+
+/* Hero on landing uses the full-width variant */
+.hero.animate-in {
+    animation: float-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

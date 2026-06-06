@@ -10,7 +10,7 @@ async function signup() {
         const password = document.getElementById('password').value;
         const button = document.getElementById('signupBtn');
 
-        const health = await UniShield.resolveApiBase(true, 'secured');
+        const health = await UniShield.resolveApiBase(true);
         if (!health) {
             notice.textContent = 'API not reachable. Start the secured Flask server first.';
             notice.classList.remove('hidden');
@@ -55,7 +55,7 @@ async function signup() {
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-        const health = await UniShield.resolveApiBase(true, 'secured');
+        const health = await UniShield.resolveApiBase(true);
         const notice = document.getElementById('notice');
         if (!health) {
             notice.textContent = 'API not reachable yet. Please start the secured server.';

@@ -4,9 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UniShield Academy | Login</title>
-    <link rel="stylesheet" href="login.css?v=20260531" />
-    <script src="app.js?v=20260531" defer></script>
-    <script src="login.js?v=20260531" defer></script>
+    <meta name="description" content="Sign in to the UniShield Academy management console to access role-based analytics and admin controls." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="app.css?v=20260601" />
+    <link rel="stylesheet" href="login.css?v=20260601" />
+    <script src="app.js?v=20260601" defer></script>
+    <script src="login.js?v=20260601" defer></script>
 </head>
 <body>
 <div class="app-shell">
@@ -15,7 +19,7 @@
             <div class="brand-mark">U</div>
             <div class="brand-text">
                 <div>UniShield Academy</div>
-                <span>School management + API payload integrity</span>
+                <span>API payload integrity lab</span>
             </div>
         </div>
         <nav class="nav">
@@ -30,7 +34,7 @@
 
 <div class="auth-shell">
     <section class="auth-hero animate-in">
-        <span class="eyebrow">Secure management workspace</span>
+        <span class="eyebrow on-dark">Secure management workspace</span>
         <h1 class="title">Sign in to the school management console.</h1>
         <p class="subtitle">
             Login is enabled in secured mode so the teacher can see the difference between an open lab and a protected system.
@@ -41,7 +45,7 @@
             <span class="stat-chip">Signed API responses</span>
             <span class="stat-chip">Audit-ready dashboard</span>
         </div>
-        <div class="mini-stats" style="margin-top: 22px;">
+        <div class="mini-stats" style="margin-top: 26px;">
             <div class="mini-stat">
                 <strong>2</strong>
                 <span>security phases</span>
@@ -55,26 +59,26 @@
                 <span>role control</span>
             </div>
         </div>
-        <div class="content-grid" style="margin-top: 26px;">
-            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+        <div class="content-grid" style="margin-top: 28px;">
+            <div class="timeline-item" style="background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); color: white;">
                 <strong>What the teacher can test</strong>
-                <span class="muted" style="color: rgba(255,255,255,0.78);">Student and admin requests travel through the same signed middleware pipeline.</span>
+                <span style="color: rgba(255,255,255,0.7); font-size:13px;">Student and admin requests travel through the same signed middleware pipeline.</span>
             </div>
-            <div class="timeline-item" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); color: white;">
+            <div class="timeline-item" style="background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); color: white;">
                 <strong>Why it matters</strong>
-                <span class="muted" style="color: rgba(255,255,255,0.78);">A proxy can still observe traffic, but it cannot tamper with a valid signed payload without detection.</span>
+                <span style="color: rgba(255,255,255,0.7); font-size:13px;">A proxy can still observe traffic, but it cannot tamper with a valid signed payload without detection.</span>
             </div>
         </div>
     </section>
 
-    <section class="auth-card card animate-in">
+    <section class="auth-card animate-in" style="animation-delay:0.07s;">
         <span class="eyebrow">Management login</span>
-        <h2 class="section-title" style="font-size: 26px; margin-top: 14px;">Welcome back</h2>
-        <p class="muted">Use your management account to access the analytics dashboard and admin controls.</p>
+        <h2 class="section-title" style="font-size: 26px; margin-top: 16px; letter-spacing:-0.01em;">Welcome back</h2>
+        <p class="muted" style="margin-top:6px; margin-bottom:0; font-size:14px;">Use your management account to access the analytics dashboard and admin controls.</p>
 
-        <div class="form-grid" style="margin-top: 22px;">
+        <div class="form-grid" style="margin-top: 28px;">
             <div class="field">
-                <label for="email">Email</label>
+                <label for="email">Email address</label>
                 <input class="input" id="email" type="email" placeholder="security.admin@university.edu" />
             </div>
             <div class="field">
@@ -84,8 +88,8 @@
             <button class="button primary" id="loginBtn" type="button" onclick="login()">Sign In</button>
             <div class="notice hidden" id="notice"></div>
             <div class="error hidden" id="error"></div>
-            <div class="helper">No account yet? <a href="signup.html">Create one</a></div>
-            <a class="button ghost" href="landing.html">Back to landing</a>
+            <div class="helper">No account yet? <a href="signup.html">Create one here</a></div>
+            <a class="button ghost" href="landing.html">← Back to landing</a>
         </div>
     </section>
 </div>

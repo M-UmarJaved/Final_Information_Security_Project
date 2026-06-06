@@ -122,7 +122,7 @@ let currentHealth = null;
     }
 
     async function loadDashboard() {
-        currentHealth = await UniShield.resolveApiBase(true, 'secured');
+        currentHealth = await UniShield.resolveApiBase(true);
         if (!currentHealth) {
             document.getElementById('security-snapshot').innerHTML = '<div class="warning">API not reachable. Start the Flask backend.</div>';
             return;

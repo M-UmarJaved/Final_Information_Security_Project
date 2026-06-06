@@ -1,23 +1,23 @@
-<!-- student_portal.html – Save on Windows Desktop and open in browser -->
+<!-- student_portal.html – UniShield Academy Student Portal -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Grade Portal | Security Lab</title>
-    <link rel="stylesheet" href="student_portal.css?v=20260531">
-    <script src="student_portal.js?v=20260531" defer></script>
+    <title>Student Portal | UniShield Academy Security Lab</title>
+    <meta name="description" content="UniShield Academy student portal – demonstrates API payload interception and HMAC-based tamper protection in a live InfoSec lab." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="student_portal.css?v=20260601">
 </head>
 <body>
 
 <div class="topbar">
     <div class="brand">
-        <div class="brand-mark">
-            U
-        </div>
+        <div class="brand-mark">U</div>
         <div class="brand-text">
             <div>UniShield Academy</div>
-            <span>School management + API payload integrity</span>
+            <span>API payload integrity lab</span>
         </div>
     </div>
     <nav class="nav">
@@ -32,42 +32,53 @@
 </div>
 
 <div class="page">
+    <!-- Left Hero Panel -->
     <section class="hero">
         <div class="pill">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Security Lab Demo
         </div>
-        <h1>API Integrity &<br>Tamper Protection</h1>
-        <p>A professional demonstration highlighting how an unsecured endpoint can be manipulated, and how HMAC verification strictly enforces data integrity.</p>
-        
+        <h1>API Integrity &amp;<br>Tamper Protection</h1>
+        <p>A live demonstration highlighting how an unsecured endpoint can be manipulated in transit, and how HMAC-SHA256 verification strictly enforces payload integrity.</p>
+
         <div class="stack">
             <div class="item">
                 <div class="item-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </div>
                 <div>
-                    <strong>Phase 1: Vulnerability</strong><br>
-                    <span style="color:var(--slate-400)">The unsecured endpoint blindly trusts incoming payloads, allowing attackers to request data for IDs they shouldn't access.</span>
+                    <strong>Phase 1: BOLA Vulnerability</strong><br>
+                    <span style="color:rgba(255,255,255,0.6); font-size:13px;">The unsecured endpoint blindly trusts incoming payloads. Kali can change <code style="background:rgba(255,255,255,0.1); padding:1px 5px; border-radius:4px; font-family:monospace;">student_id</code> mid-flight and fetch any student's private record.</span>
                 </div>
             </div>
             <div class="item">
-                <div class="item-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <div class="item-icon" style="color:#10b981;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
                 </div>
                 <div>
                     <strong>Phase 2: HMAC Defense</strong><br>
-                    <span style="color:var(--slate-400)">The secured endpoint requires a cryptographic signature. Altered payloads break the signature math, resulting in an immediate block.</span>
+                    <span style="color:rgba(255,255,255,0.6); font-size:13px;">Signed requests carry a cryptographic signature. Any bit change breaks the HMAC math — the server rejects the request immediately with a 403.</span>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-icon" style="color:#f59e0b;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                </div>
+                <div>
+                    <strong>Replay Protection</strong><br>
+                    <span style="color:rgba(255,255,255,0.6); font-size:13px;">Each payload includes a Unix timestamp. Requests older than 30 seconds are automatically rejected to block replay attacks.</span>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- Right Panel: Request Console -->
     <div class="portal-column">
     <section class="card">
         <div class="card-header">
             <div>
                 <div class="title">Request Console</div>
-                <div class="subtitle">Select a target student and analyze the response</div>
+                <div class="subtitle">Select a target ID and execute the API request</div>
             </div>
             <div class="role-badge" id="role-badge">Role: --</div>
         </div>
@@ -77,7 +88,7 @@
                 <div class="status-dot"></div>
                 <span id="mode-label">UNSECURED SYSTEM</span>
             </div>
-            <div class="mode-note">The portal follows the backend mode you launch and the current session state.</div>
+            <div class="mode-note">The portal auto-detects the backend mode from the API health check. Switch servers to change modes.</div>
         </div>
 
         <div class="form-group">
@@ -89,8 +100,11 @@
             </div>
         </div>
 
-        <button id="fetchBtn" onclick="fetchGrade()">EXECUTE REQUEST</button>
-        
+        <button id="fetchBtn" onclick="fetchGrade()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            EXECUTE REQUEST
+        </button>
+
         <div class="terminal">
             <div class="terminal-header">
                 <div class="t-dot r"></div>
@@ -98,27 +112,29 @@
                 <div class="t-dot g"></div>
                 <div class="t-title">network_analyzer.sh</div>
             </div>
-            <div class="log" id="log">System initialized. Waiting for execution...</div>
+            <div class="log" id="log">System initialized. Waiting for execution command...</div>
         </div>
-        
-        <div class="footer-note">Designed to simulate a real-world API request lifecycle.</div>
-    </section>
 
+        <div class="footer-note">Simulates a real-world API request lifecycle with full cryptographic tracing.</div>
+    </section>
     </div>
 
+    <!-- Full-width Result Card -->
     <section class="card result-card">
         <div class="card-header">
             <div>
                 <div class="title">Student Record Details</div>
-                <div class="subtitle">Fetched result appears here as a dedicated detail card</div>
+                <div class="subtitle">Fetched result appears here as a dedicated detail panel</div>
             </div>
             <div class="role-badge">DETAILS PANEL</div>
         </div>
         <div class="result-placeholder" id="resultEmpty">
-            Choose a student, keep the portal in the desired mode, and press execute to render the full record here.
+            Choose a student account ID, keep the portal in the desired security mode, and press <strong>Execute Request</strong> to render the full student record here.
         </div>
         <div class="result" id="result"></div>
     </section>
 </div>
+
+<script src="student_portal.js?v=20260601" defer></script>
 </body>
 </html>
